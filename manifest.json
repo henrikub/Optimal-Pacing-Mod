@@ -1,0 +1,24 @@
+{
+    "manifest_version": 1,
+    "name": "Test",
+    "description": "test",
+    "author": "Henrik Brokke",
+    "website_url": "https://saucellc.io",
+    "version": "0.0.1",
+    "web_root": "pages",
+    "windows": [{
+        "file": "pages/wbal.html",
+        "id": "w_bal",
+        "name": "W' Balance",
+        "description": "test",
+        "always_visible": true,
+        "overlay": true,
+        "frame": false,
+        "default_bounds": {
+            "width": 500,
+            "height": 700,
+            "x": 50,
+            "y": 50
+        }
+    }]
+}

@@ -1,24 +1,32 @@
 {
     "manifest_version": 1,
-    "name": "Test",
-    "description": "test",
+    "name": "Optimal Pacing",
+    "description": "Optimal pacing of time trial cycling.",
     "author": "Henrik Brokke",
-    "website_url": "https://saucellc.io",
+    "website_url": "https://github.com/henrikub/s4z_pacing_mod",
     "version": "0.0.1",
     "web_root": "pages",
-    "windows": [{
-        "file": "pages/wbal.html",
-        "id": "w_bal",
-        "name": "W' Balance",
-        "description": "test",
-        "always_visible": true,
-        "overlay": true,
-        "frame": false,
-        "default_bounds": {
-            "width": 500,
-            "height": 700,
-            "x": 50,
-            "y": 50
+    "content_js": [
+        
+    ],
+    "content_css": [
+        
+    ],
+    "windows": [
+        {
+            "file": "pages/pacing.html",
+            "id": "pacing",
+            "name": "Optimal Pacing",
+            "description": "optimal pacing",
+            "always_visible": true,
+            "overlay": true,
+            "frame": false,
+            "default_bounds": {
+                "width": 300,
+                "height": 300,
+                "x": 50,
+                "y": 50
+            }
         }
-    }]
+    ]
 }

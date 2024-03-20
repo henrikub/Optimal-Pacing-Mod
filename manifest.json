@@ -1,32 +1,26 @@
 {
     "manifest_version": 1,
-    "name": "Optimal Pacing",
-    "description": "Optimal pacing of time trial cycling.",
+    "name": "Pacing mod",
+    "description": "Optimal pacing mod",
     "author": "Henrik Brokke",
     "website_url": "https://github.com/henrikub/s4z_pacing_mod",
     "version": "0.0.1",
     "web_root": "pages",
-    "content_js": [
-        
-    ],
-    "content_css": [
-        
-    ],
+    "id": "s4z_pacing_mod",
     "windows": [
-        {
-            "file": "pages/pacing.html",
-            "id": "pacing",
-            "name": "Optimal Pacing",
-            "description": "optimal pacing",
-            "always_visible": true,
-            "overlay": true,
-            "frame": false,
-            "default_bounds": {
-                "width": 300,
-                "height": 300,
-                "x": 50,
-                "y": 50
-            }
+    {
+        "file": "pages/pacing.html",
+        "id": "pacing",
+        "name": "Optimal Pacing",
+        "description": "display optimal power output",
+        "always_visible": true,
+        "overlay": true,
+        "frame": false,
+        "default_bounds": {
+            "width": 300,
+            "height": 300,
+            "x": -300,
+            "y": 100
         }
-    ]
+    }]
 }

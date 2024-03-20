@@ -1,46 +1,77 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="en" tabindex="0" data-settings-key="pacing_settings_v1">
     <head>
         <meta charset="utf-8"/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
         <meta name="apple-mobile-web-app-capable" content="yes"/>
         <meta http-equiv="Content-Security-Policy" content="script-src 'self' 'unsafe-inline';"/>
 
-        <title>MOD: Optimal pacing</title>
+        <title>Mod: Optimal Pacing</title>
+
         <script type="module">
             import {main} from './src/pacing.mjs';
             main();
         </script>
+        <style>
+            table {
+                width: 100%;
+            } 
+            table td {
+                text-align: center !important;
+                width: 20%;
+            }
+            td[heavy] {
+                font-weight: 600;
+            }
+            table th {
+                text-align: center !important;
+                width: 20%;
+            }              
+            table thead {
+                width: 100%; 
+                font-variant: all-small-caps;
+            }
+            table tbody {
+                width: 100%;
+            }
+            body {
+                overflow: hidden; /* Hide scrollbars */  
+            }                
+        </style>
         <link id="favicon" rel="shortcut icon" href="/pages/images/favicon.png"/>
         <link rel="stylesheet" href="/pages/css/common.css"/>
+        <link rel="stylesheet" href="/pages/css/nearby.css"/>
+        
     </head>
     <body>
         <div id="titlebar">
             <header>
                 <div class="logo"><img title="icon" src="/pages/images/icon128.png"/></div>
-                <div class="title">MOD: Optimal pacing</div>
+                <div class="title">Mod: Optimal Pacing</div>
                 <div class="filler"></div>
-                <div class="buttons">           
+                <div class="buttons">
+                    <a class="button open-settings" href="./pacing-settings.html?width=380&height=520&child-window"
+                    title="Open settings window" target="pacing_settings_v1"><ms>settings</ms></a>    
                     <div title="Minimize" class="button minimize electron-only"><ms>minimize</ms></div>
                     <div title="Close this window" class="button close electron-only"><ms>close</ms></div>
                 </div>
             </header>
         </div>
         <div id="content">
-            <table id = "table">
+            <table id="table" >
                 <thead>
                     <tr>
-                        <th>
-                            <th>Your Power</th>
-                            <th>Optimal Power</th>
-                        </th>
+                        <th></th>
+                        <th>Target Power</th>
+                        <th>Current power</th>             
                     </tr>
                 </thead>
+
                 <tbody>
                     <tr>
-                        <td></dh>
-                        <td heavy id ="current_power"></td>
-                        <td>300</td>
+                        <td ></td>
+                        <td heavy id="current_power"></td>
+                        <td heavy id="your_power"></td>
                     </tr>
                 </tbody>
             </table>

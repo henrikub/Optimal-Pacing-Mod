@@ -1,6 +1,7 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
 
+// import data from '../../optimal_power.json' with { type: 'json'}
 
 const doc = document.documentElement;
 const L = sauce.locale;
@@ -21,12 +22,6 @@ common.settingsStore.setDefault({
 });
 
 
-const spd = (v, entry) => H.pace(v, {precision: 0, suffix: true, html: true, sport: entry.state.sport});
-const pwr = v => H.power(v, {suffix: true, html: true});
-const hr = v => v ? num(v) : '-';
-const dist = v => H.distance(v, {precision: 1, suffix: true, html: true});
-
-
 let overlayMode;
 if (window.isElectron) {
     overlayMode = !!window.electron.context.spec.overlay;
@@ -42,6 +37,22 @@ function render() {
 
 }
 
+function get_target_power(distance, distance_arr, power_arr) {
+    let index = 0;
+    let min_diff = Math.abs(distance - distance_arr[0]);
+
+    for (let i = 1; i < distance_arr.length; i++) {
+        let difference = Math.abs(distance - distance_arr[i]);
+        if (difference < min_diff) {
+            min_diff = difference;
+            index = i;
+        }
+    }
+    return power_arr[index];
+}
+
+let distance_arr = [0, 10000, 15000, 20000]
+let power_arr = [100, 200, 300, 400]
 
 
 export async function main() {
@@ -83,9 +94,14 @@ export async function main() {
         if (watching.athleteId !== athleteId) {
             athleteId = watching.athleteId;
         }
+        console.log(watching.state)
         document.getElementById('current_power').innerHTML = watching.state.power
-        document.getElementById('w_bal').innerHTML = watching.wBal
+        document.getElementById('target_power').innerHTML = get_target_power(watching.state.distance, distance_arr, power_arr)
+        document.getElementById('w_bal').innerHTML = Math.round(watching.wBal)
         document.getElementById('heart_rate').innerHTML = watching.state.heartrate
+        document.getElementById('distance').innerHTML = watching.state.distance
+        document.getElementById('speed').innerHTML = watching.state.speed
+        document.getElementById('time').innerHTML = watching.state.time
     });
 }
 

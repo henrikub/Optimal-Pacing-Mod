@@ -83,9 +83,9 @@ export async function main() {
         if (watching.athleteId !== athleteId) {
             athleteId = watching.athleteId;
         }
-        document.getElementById('current_power').innerHTML = pwr(watching.stats.power.smooth[3])
-        document.getElementById('w_bal').innerHTML = watching.state.heartrate
-        document.getElementById('heart_rate').innerHTML = watching.state.heart_rate
+        document.getElementById('current_power').innerHTML = watching.state.power
+        document.getElementById('w_bal').innerHTML = watching.wBal
+        document.getElementById('heart_rate').innerHTML = watching.state.heartrate
     });
 }
 

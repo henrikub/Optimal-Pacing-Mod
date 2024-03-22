@@ -1,12 +1,13 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
+import opt_results from './optimal_power.json' assert {type : 'json'};
 
-let optimization_result;
-fetch('/pages/deps/optimal_power.json')
-  .then(response => response.json())
-  .then(data => {
-    optimization_result = data;
-  });
+// let optimization_result;
+// fetch('/pages/deps/optimal_power.json')
+//   .then(response => response.json())
+//   .then(data => {
+//     optimization_result = data;
+//   });
 
 
 
@@ -58,10 +59,6 @@ function get_target_power(distance, distance_arr, power_arr) {
     return power_arr[index];
 }
 
-let distance_arr = [0, 10000, 15000, 20000]
-let power_arr = [100, 200, 300, 400]
-
-
 export async function main() {
     common.initInteractionListeners();
     //common.initNationFlags();  // bg okay
@@ -102,7 +99,7 @@ export async function main() {
             athleteId = watching.athleteId;
         }
         console.log(watching.state)
-        let target_power = Math.round(get_target_power(watching.state.distance, optimization_result.distance, optimization_result.power))
+        let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
         document.getElementById('current_power').innerHTML = watching.state.power
         document.getElementById('target_power').innerHTML = target_power
         if (Math.abs(watching.state.power - target_power) <= 10) {

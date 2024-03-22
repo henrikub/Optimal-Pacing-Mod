@@ -1,7 +1,14 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
 
-// import data from '../../optimal_power.json' with { type: 'json'}
+let optimization_result;
+fetch('/pages/deps/optimal_power.json')
+  .then(response => response.json())
+  .then(data => {
+    optimization_result = data;
+  });
+
+
 
 const doc = document.documentElement;
 const L = sauce.locale;
@@ -95,13 +102,19 @@ export async function main() {
             athleteId = watching.athleteId;
         }
         console.log(watching.state)
+        let target_power = Math.round(get_target_power(watching.state.distance, optimization_result.distance, optimization_result.power))
         document.getElementById('current_power').innerHTML = watching.state.power
-        document.getElementById('target_power').innerHTML = get_target_power(watching.state.distance, distance_arr, power_arr)
-        document.getElementById('w_bal').innerHTML = Math.round(watching.wBal)
-        document.getElementById('heart_rate').innerHTML = watching.state.heartrate
-        document.getElementById('distance').innerHTML = watching.state.distance
-        document.getElementById('speed').innerHTML = watching.state.speed
-        document.getElementById('time').innerHTML = watching.state.time
+        document.getElementById('target_power').innerHTML = target_power
+        if (Math.abs(watching.state.power - target_power) <= 10) {
+            document.getElementById('current_power').style.color = 'green'
+        } else {
+            document.getElementById('current_power').style.color = 'red'
+        }
+        // document.getElementById('w_bal').innerHTML = Math.round(watching.wBal)
+        // document.getElementById('heart_rate').innerHTML = watching.state.heartrate
+        // document.getElementById('distance').innerHTML = watching.state.distance
+        // document.getElementById('speed').innerHTML = watching.state.speed
+        // document.getElementById('time').innerHTML = watching.state.time
     });
 }
 

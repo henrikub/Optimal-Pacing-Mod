@@ -1,6 +1,6 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
-import opt_results from './optimal_power.json' assert {type : 'json'};
+import opt_results from './hilly_route.json' assert {type : 'json'};
 
 const doc = document.documentElement;
 const L = sauce.locale;

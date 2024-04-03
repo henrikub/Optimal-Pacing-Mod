@@ -2,21 +2,26 @@ import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
 import opt_results from './optimal_power.json' assert {type : 'json'};
 
-// let optimization_result;
-// fetch('/pages/deps/optimal_power.json')
-//   .then(response => response.json())
-//   .then(data => {
-//     optimization_result = data;
-//   });
-
-
-
 const doc = document.documentElement;
 const L = sauce.locale;
 const H = L.human;
 const num = H.number;
 let imperial = common.storage.get('/imperialUnits');
 L.setImperial(imperial);
+
+// let targetPowerChart = new Chart(document.getElementById('target_power_chart'), {
+//     type: 'line',
+//     data: {
+//         labels: Array(10).fill(''),
+//         datasets: [{
+//             label: 'Target Power',
+//             data: targetPowerData,
+//             fill: false,
+//             borderColor: 'rgb(75, 192, 192)',
+//             tension: 0.1
+//         }]
+//     }
+// });
 
 let gameConnection;
 
@@ -57,6 +62,21 @@ function get_target_power(distance, distance_arr, power_arr) {
         }
     }
     return power_arr[index];
+}
+
+function get_target_power_array(distance, distance_arr, power_arr) {
+    // Må leggge til funksjonalitet for slutten av arrayet
+    let index = 0;
+    let min_diff = Math.abs(distance - distance_arr[0]);
+
+    for (let i = 1; i < distance_arr.length; i++) {
+        let difference = Math.abs(distance - distance_arr[i]);
+        if (difference < min_diff) {
+            min_diff = difference;
+            index = i;
+        }
+    }
+    return power_arr.slice(index, index + 100)
 }
 
 export async function main() {
@@ -107,6 +127,11 @@ export async function main() {
         } else {
             document.getElementById('current_power').style.color = 'red'
         }
+
+        let target_power_arr = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power)
+        console.log(target_power_arr);
+
+
         // document.getElementById('w_bal').innerHTML = Math.round(watching.wBal)
         // document.getElementById('heart_rate').innerHTML = watching.state.heartrate
         // document.getElementById('distance').innerHTML = watching.state.distance

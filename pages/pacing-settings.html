@@ -16,6 +16,12 @@
             import {settingsMain} from './src/states.mjs';
             settingsMain();
         </script>
+        <script>
+        function run_python_script() {
+            var script_path = './src/test.py';
+            subprocess.run(["python", script_path]);
+        }
+        </script>
     </head>
     <body>
         <div id="titlebar">
@@ -43,7 +49,14 @@
                     <key>Background color:</key>
                     <input type="color" name="backgroundColor" data-depends-on="solidBackground"/>
                     <input type="text" name="backgroundColor" data-depends-on="solidBackground" size="7"/>
-                </label>                                                                           
+                </label>                                                                         
+            </form>
+            <form id="optimization" class="section">
+                <div class="title">Optimization</div>
+                <label>
+                    <key>Run python script:</key>
+                    <button onclick="run_python_script()">Run python script</button>
+                </label>  
             </form>
         </div>
     </body>

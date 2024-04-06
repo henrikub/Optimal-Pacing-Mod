@@ -1,6 +1,10 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
 import opt_results from './hilly_route.json' assert {type : 'json'};
+const [echarts, theme] = await Promise.all([
+    import('/pages/deps/src/echarts.mjs'),
+    import('/pages/src/echarts-sauce-theme.mjs'),
+]);
 
 const doc = document.documentElement;
 const L = sauce.locale;
@@ -8,20 +12,6 @@ const H = L.human;
 const num = H.number;
 let imperial = common.storage.get('/imperialUnits');
 L.setImperial(imperial);
-
-// let targetPowerChart = new Chart(document.getElementById('target_power_chart'), {
-//     type: 'line',
-//     data: {
-//         labels: Array(10).fill(''),
-//         datasets: [{
-//             label: 'Target Power',
-//             data: targetPowerData,
-//             fill: false,
-//             borderColor: 'rgb(75, 192, 192)',
-//             tension: 0.1
-//         }]
-//     }
-// });
 
 let gameConnection;
 
@@ -65,7 +55,6 @@ function get_target_power(distance, distance_arr, power_arr) {
 }
 
 function get_target_power_array(distance, distance_arr, power_arr) {
-    // Må leggge til funksjonalitet for slutten av arrayet
     let index = 0;
     let min_diff = Math.abs(distance - distance_arr[0]);
 
@@ -76,14 +65,16 @@ function get_target_power_array(distance, distance_arr, power_arr) {
             index = i;
         }
     }
-    return power_arr.slice(index, index + 100)
+    return [power_arr.slice(index, index + 100), distance_arr.slice(index, index + 100)];
 }
 
 export async function main() {
     common.initInteractionListeners();
     //common.initNationFlags();  // bg okay
   
-
+    window.addEventListener('resize', function() {
+        chart.resize();
+    });
     const gcs = await common.rpc.getGameConnectionStatus();
 
     gameConnection = !!(gcs && gcs.connected);
@@ -113,7 +104,12 @@ export async function main() {
         } 
     });
 
+    let chart = echarts.init(document.getElementById('chart_container'), 'sauce', {renderer: 'svg'});
+    let chart_options
+
     let athleteId;
+    let athlete_power = [];
+    let athlete_distance = [];
     common.subscribe('athlete/watching', watching => {
         if (watching.athleteId !== athleteId) {
             athleteId = watching.athleteId;
@@ -127,16 +123,44 @@ export async function main() {
         } else {
             document.getElementById('current_power').style.color = 'red'
         }
+        athlete_power.push(watching.state.power)
+        athlete_distance.push(watching.state.distance)
+        let [target_power_arr, distance_arr] = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power)
 
-        let target_power_arr = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power)
-        console.log(target_power_arr);
+        let target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
+        let prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
 
-
-        // document.getElementById('w_bal').innerHTML = Math.round(watching.wBal)
-        // document.getElementById('heart_rate').innerHTML = watching.state.heartrate
-        // document.getElementById('distance').innerHTML = watching.state.distance
-        // document.getElementById('speed').innerHTML = watching.state.speed
-        // document.getElementById('time').innerHTML = watching.state.time
+        chart_options = {
+            xAxis: {
+                type: 'value',
+                min: 'dataMin',
+                name: 'Distance [m]',
+                splitLine: {
+                    show: false
+                }
+            },
+            yAxis: {
+                type: 'value',
+                name: 'Power [W]',
+                splitLine: {
+                    show: false
+                }
+            },
+            series: [
+                {
+                    data: target_power_data,
+                    type: 'line',
+                    showSymbol: false
+                },
+                {
+                    data: prev_power_data,
+                    type: 'line',
+                    smooth: true,
+                    showSymbol: false
+                }
+            ]
+        };
+        chart.setOption(chart_options);
     });
 }
 
@@ -154,6 +178,4 @@ function setBackground() {
 export async function settingsMain() {
     common.initInteractionListeners();
     await common.initSettingsForm('form#general')();
-    //await initWindowsPanel();
 }
-

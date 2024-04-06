@@ -36,7 +36,13 @@
             }
             body {
                 overflow: hidden; /* Hide scrollbars */  
-            }                
+            }
+            #chart_container {
+                height: 100vh;;
+                width: 100vh;
+                vertical-align: middle;
+                overflow: hidden;
+            }          
         </style>
         <link id="favicon" rel="shortcut icon" href="/pages/images/favicon.png"/>
         <link rel="stylesheet" href="/pages/css/common.css"/>
@@ -63,11 +69,6 @@
                     <tr>
                         <th>Power [W]</th>
                         <th>Target Power [W]</th>
-                        <!-- <th>W' balance</th> 
-                        <th>Heart Rate</th>
-                        <th>Distance</th> 
-                        <th>Speed</th>   
-                        <th>Time</th>              -->
                     </tr>
                 </thead>
 
@@ -75,16 +76,13 @@
                     <tr>
                         <td heavy id="current_power"></td>
                         <td heavy id="target_power"></td>
-                        <!-- <td heavy id="w_bal"></td>
-                        <td heavy id="heart_rate"></td>
-                        <td heavy id="distance"></td>
-                        <td heavy id="speed"></td>
-                        <td heavy id="time"></td> -->
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <canvas id = "powerplot" width="100" height="50"></canvas>
+        </div> 
+        <div id="content">
+            <div id="chart_container"></div>
+        </div>   
         <div id="hintbar">
             <div class="hint"></div>
         </div>

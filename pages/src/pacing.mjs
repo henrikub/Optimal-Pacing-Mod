@@ -1,6 +1,6 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
-import opt_results from './hilly_route.json' assert {type : 'json'};
+import opt_results from '../../optimal_power.json' assert {type : 'json'};
 const [echarts, theme] = await Promise.all([
     import('/pages/deps/src/echarts.mjs'),
     import('/pages/src/echarts-sauce-theme.mjs'),
@@ -71,7 +71,7 @@ function get_target_power_array(distance, distance_arr, power_arr) {
             index = i;
         }
     }
-    return [power_arr.slice(index, index + 100), distance_arr.slice(index, index + 100)];
+    return [power_arr.slice(index, index + 50), distance_arr.slice(index, index + 50)];
 }
 
 export async function main() {

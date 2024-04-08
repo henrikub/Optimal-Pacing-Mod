@@ -57,6 +57,9 @@ async function check_json_change() {
     console.log('The JSON file has changed');
     cache = data;
     opt_results = cache
+    document.getElementById('message_box').innerHTML = 'Reoptimized!'
+  } else {
+    document.getElementById('message_box').innerHTML = ''
   }
 }
 

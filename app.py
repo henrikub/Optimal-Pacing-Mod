@@ -5,6 +5,17 @@ import casadi as ca
 import numpy as np
 from simulator import *
 import json
+import threading
+import random
+import sys
+import websocket
+
+
+
+request_id = f'random-req-id-{random.randint(1, 100000000)}'
+sub_id = f'random-sub-id-{random.randint(1, 100000000)}'
+
+
 
 st.title("Optimization settings")
 
@@ -90,3 +101,60 @@ if st.button("Run optimization"):
     }
     with open('pages/src/optimal_power.json', 'w') as file:
         json.dump(power_dict, file)
+
+placeholder = st.empty()
+
+def on_message(ws, raw_msg):
+    msg = json.loads(raw_msg)
+    if msg['type'] == 'response':
+        if not msg['success']:
+            raise Exception('subscribe request failure')
+    elif msg['type'] == 'event' and msg['success']:
+        data = msg['data']
+        global w_bal
+        w_bal = data["stats"]["wBal"]
+        placeholder.text(w_bal)
+        # Reoptimize if Wbal difference is larger than 5k
+
+
+
+def on_error(ws, error):
+    print("socket error", error)
+
+
+def on_close(ws, status_code, msg):
+    print("socket closed", status_code, msg)
+
+
+def on_open(ws):
+    ws.send(json.dumps({
+        "type": "request",
+        "uid": request_id,
+        "data": {
+            "method": "subscribe",
+            "arg": {
+                "event": "athlete/watching", # watching, nearby, groups, etc...
+                "subId": sub_id
+            }
+        }
+    }))
+
+def run_websocket():
+        #websocket.enableTrace(True)
+    if len(sys.argv) < 2:
+        host = "ws://localhost:1080/api/ws/events"
+    else:
+        host = sys.argv[1]
+    print("Connecting to:", host)
+    ws = websocket.WebSocketApp(host,
+                                on_open = on_open,
+                                on_message=on_message,
+                                on_error=on_error,
+                                on_close=on_close)
+    ws.run_forever()
+
+
+if st.button('Start Time Trial'):
+    run_websocket()
+    print(w_bal)
+    

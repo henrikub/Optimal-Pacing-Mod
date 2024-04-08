@@ -88,5 +88,5 @@ if st.button("Run optimization"):
         'time': t_grid.full().flatten().tolist(),
         'distance': sol.value(X[0,:]).tolist()
     }
-    with open('optimal_power.json', 'w') as file:
+    with open('pages/src/optimal_power.json', 'w') as file:
         json.dump(power_dict, file)

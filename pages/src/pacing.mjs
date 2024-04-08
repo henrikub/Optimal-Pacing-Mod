@@ -1,10 +1,11 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
-import opt_results from '../../optimal_power.json' assert {type : 'json'};
+import opt_result from './optimal_power.json' assert {type : 'json'};
 const [echarts, theme] = await Promise.all([
     import('/pages/deps/src/echarts.mjs'),
     import('/pages/src/echarts-sauce-theme.mjs'),
 ]);
+let opt_results = opt_result
 
 const doc = document.documentElement;
 const L = sauce.locale;
@@ -45,6 +46,21 @@ if (window.isElectron) {
 function render() {
 
 }
+
+let cache = null;
+
+async function check_json_change() {
+  const response = await fetch('src/optimal_power.json');
+  const data = await response.json();
+
+  if (JSON.stringify(data) !== JSON.stringify(cache)) {
+    console.log('The JSON file has changed');
+    cache = data;
+    opt_results = cache
+  }
+}
+
+setInterval(check_json_change, 5000);
 
 function get_target_power(distance, distance_arr, power_arr) {
     let index = 0;
@@ -110,7 +126,7 @@ export async function main() {
     });
 
     let chart = echarts.init(document.getElementById('chart_container'), 'sauce', {renderer: 'svg'});
-    let chart_options
+    let chart_options;
 
 
     common.subscribe('athlete/watching', watching => {
@@ -179,6 +195,10 @@ export async function main() {
             ]
         };
         chart.setOption(chart_options);
+        if (athlete_distance[-1] > 4000) {
+            console.log("Reload!!")
+            location.reload()
+        }
     });
 }
 

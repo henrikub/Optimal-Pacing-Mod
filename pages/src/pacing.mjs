@@ -13,6 +13,12 @@ const num = H.number;
 let imperial = common.storage.get('/imperialUnits');
 L.setImperial(imperial);
 
+let athleteId;
+let athlete_power = [];
+let athlete_distance = [];
+let target_power_data = []
+let prev_power_data = []
+
 let gameConnection;
 
 common.settingsStore.setDefault({
@@ -93,7 +99,6 @@ export async function main() {
                 {overlay: changed.get('overlayMode')});
             await common.rpc.reopenWindow(window.electron.context.id);
         }
-
         render();
         
     });
@@ -107,14 +112,17 @@ export async function main() {
     let chart = echarts.init(document.getElementById('chart_container'), 'sauce', {renderer: 'svg'});
     let chart_options
 
-    let athleteId;
-    let athlete_power = [];
-    let athlete_distance = [];
+
     common.subscribe('athlete/watching', watching => {
         if (watching.athleteId !== athleteId) {
+            console.log("Changed athlete ID!!!")
+            athlete_distance = []
+            athlete_power = []
+            target_power_data = []
+            prev_power_data = []
             athleteId = watching.athleteId;
         }
-        console.log(watching.state)
+        // console.log(watching.state)
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
         document.getElementById('current_power').innerHTML = watching.state.power
         document.getElementById('target_power').innerHTML = target_power
@@ -127,8 +135,8 @@ export async function main() {
         athlete_distance.push(watching.state.distance)
         let [target_power_arr, distance_arr] = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power)
 
-        let target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
-        let prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
+        target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
+        prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
 
         chart_options = {
             xAxis: {
@@ -137,6 +145,11 @@ export async function main() {
                 name: 'Distance [m]',
                 splitLine: {
                     show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: 'white'
+                    }
                 }
             },
             yAxis: {
@@ -144,6 +157,11 @@ export async function main() {
                 name: 'Power [W]',
                 splitLine: {
                     show: false
+                },
+                axisLine: {
+                    lineStyle: {
+                        color: 'white'
+                    }
                 }
             },
             series: [

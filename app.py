@@ -5,11 +5,9 @@ import casadi as ca
 import numpy as np
 from simulator import *
 import json
-import threading
 import random
 import sys
 import websocket
-
 
 
 request_id = f'random-req-id-{random.randint(1, 100000000)}'
@@ -125,7 +123,7 @@ def on_message(ws, raw_msg):
         placeholder.text(f"Athlete state: {athlete_state}") 
         target_wbal = find_optimal_wbal(athlete_state[0])
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
-        if np.abs(athlete_state[2] - target_wbal) > 5000 and athlete_state[0] > 1000 and athlete_state[1] > 1: 
+        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 1: 
             # Reoptimize if w_bal is more than 5k off target, distance is longer than 1k and speed > 1mps
             print("Need to reoptimize!")
             index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]

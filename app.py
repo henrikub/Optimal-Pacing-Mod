@@ -97,12 +97,21 @@ if st.button("Run optimization"):
     power_dict = {
         'power': sol.value(U).tolist(),
         'time': t_grid.full().flatten().tolist(),
-        'distance': sol.value(X[0,:]).tolist()
+        'distance': sol.value(X[0,:]).tolist(),
+        'w_bal': sol.value(X[2,:]).tolist()
     }
     with open('pages/src/optimal_power.json', 'w') as file:
         json.dump(power_dict, file)
 
 placeholder = st.empty()
+placeholder2 = st.empty()
+
+def find_optimal_wbal(distance):
+    opt_results = {}
+    with open('pages/src/optimal_power.json', 'r') as file:
+        opt_results = json.load(file)
+    index = np.argwhere(np.array(opt_results['distance']) >= distance)[0][0]
+    return opt_results['w_bal'][index]
 
 def on_message(ws, raw_msg):
     msg = json.loads(raw_msg)
@@ -111,12 +120,57 @@ def on_message(ws, raw_msg):
             raise Exception('subscribe request failure')
     elif msg['type'] == 'event' and msg['success']:
         data = msg['data']
-        global w_bal
-        w_bal = data["stats"]["wBal"]
-        placeholder.text(w_bal)
-        # Reoptimize if Wbal difference is larger than 5k
-
-
+        global athlete_state
+        athlete_state = [data['state']['distance'], data['state']['speed']/3.6, data["stats"]["wBal"]]
+        placeholder.text(f"Athlete state: {athlete_state}") 
+        target_wbal = find_optimal_wbal(athlete_state[0])
+        placeholder2.text(f"Optimal wbal:  {target_wbal}")
+        if np.abs(athlete_state[2] - target_wbal) > 5000 and athlete_state[0] > 1000 and athlete_state[1] > 1: 
+            # Reoptimize if w_bal is more than 5k off target, distance is longer than 1k and speed > 1mps
+            print("Need to reoptimize!")
+            index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]
+            dist = distance[index:]
+            dist = [elem - distance[index] for elem in dist] # Shifting to start from 0
+            elev = elevation[index:]
+            N = round(dist[-1]/5)
+            timegrid = np.linspace(0,round(dist[-1]/1000*150), N)
+            try:
+                sim_X, power, t_grid = create_initialization(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
+            except:
+                print("something went wrong")
+            optimization_opts = {
+                "N": len(t_grid)-1,
+                "time_initial_guess": t_grid[-1],
+                "smooth_power_constraint": True,
+                "w_bal_model": "ODE",
+                "integration_method": "Euler",
+                "solver": "ipopt"
+            }
+            initialization = {
+                'pos_init': sim_X[0],
+                'speed_init': sim_X[1],
+                'w_bal_init': sim_X[2],
+                'power_init': power,
+                'time_init': t_grid[-1],
+            }            
+            athlete_state[0] = 0 # Optimize from 0
+            try:
+                reopt_sol, reopt_opti, reopt_T, reopt_U, reopt_X = reoptimize(dist, elev, athlete_state, params, optimization_opts, initialization)
+            except:
+                print("something went wrong")
+            t_grid = ca.linspace(0, reopt_sol.value(reopt_T), N+1)
+            pos = np.array(reopt_sol.value(reopt_X[0,:])) + distance[index] # Shift back to original
+            dist = [elem + distance[index] for elem in dist]
+            reopt_X[0,:] = pos
+            power_dict = {
+                'power': reopt_sol.value(reopt_U).tolist(),
+                'time': t_grid.full().flatten().tolist(),
+                'distance': reopt_sol.value(reopt_X[0,:]).tolist(),
+                'w_bal': reopt_sol.value(reopt_X[2,:]).tolist()
+            }
+            with open('pages/src/optimal_power.json', 'w') as file:
+                json.dump(power_dict, file)
+            
 
 def on_error(ws, error):
     print("socket error", error)
@@ -153,8 +207,7 @@ def run_websocket():
                                 on_close=on_close)
     ws.run_forever()
 
-
 if st.button('Start Time Trial'):
     run_websocket()
-    print(w_bal)
+    
     

@@ -141,7 +141,7 @@ export async function main() {
             prev_power_data = []
             athleteId = watching.athleteId;
         }
-        // console.log(watching.state)
+        console.log(watching.state)
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
         document.getElementById('current_power').innerHTML = watching.state.power
         document.getElementById('target_power').innerHTML = target_power
@@ -198,10 +198,6 @@ export async function main() {
             ]
         };
         chart.setOption(chart_options);
-        if (athlete_distance[-1] > 4000) {
-            console.log("Reload!!")
-            location.reload()
-        }
     });
 }
 

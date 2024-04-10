@@ -58,9 +58,9 @@ if st.button("Run optimization"):
     timegrid = np.linspace(0,round(distance[-1]/1000*150), N)
 
     X, power, t_grid = create_initialization(timegrid, [distance[0], 1, params.get('w_prime')], distance, elevation, params)
-    
+    N = len(power)-1
     optimization_opts = {
-        "N": len(t_grid)-1,
+        "N": N,
         "time_initial_guess": t_grid[-1],
         "smooth_power_constraint": True,
         "w_bal_model": "ODE",
@@ -136,8 +136,10 @@ def on_message(ws, raw_msg):
                 sim_X, power, t_grid = create_initialization(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
             except:
                 print("something went wrong")
+
+            N = len(power)-1
             optimization_opts = {
-                "N": len(t_grid)-1,
+                "N": N,
                 "time_initial_guess": t_grid[-1],
                 "smooth_power_constraint": True,
                 "w_bal_model": "ODE",

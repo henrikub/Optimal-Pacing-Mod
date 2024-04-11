@@ -121,7 +121,7 @@ export async function main() {
         render();
         
     });
-
+    setBackground()
     common.storage.addEventListener('globalupdate', ev => {
         if (ev.data.key === '/imperialUnits') {
             L.setImperial(imperial = ev.data.value);

@@ -30,7 +30,7 @@ with open('routes.json', 'r') as file:
 
 distance = routes_dict[route_name]['distance']
 elevation = routes_dict[route_name]['elevation']
-
+# print(len(distance))
 if num_laps != 1:
     new_elevation = []
     new_distance = []
@@ -39,6 +39,13 @@ if num_laps != 1:
         new_distance.extend([elem + i*max(distance) for elem in distance])
     elevation = new_elevation
     distance = new_distance
+    for i in range(len(distance)-10):
+        if distance[i+1] - distance[i] < 0.6:
+            distance.pop(i+1)
+            elevation.pop(i+1)
+
+
+
 # Params
 params = {
     'mass_rider': 78,

@@ -17,8 +17,11 @@ L.setImperial(imperial);
 let athleteId;
 let athlete_power = [];
 let athlete_distance = [];
-let target_power_data = []
-let prev_power_data = []
+let target_power_data = [];
+let prev_power_data = [];
+let power_color_data = [];
+let powerZones;
+let colors;
 
 let gameConnection;
 
@@ -93,6 +96,16 @@ function get_target_power_array(distance, distance_arr, power_arr) {
     return [power_arr.slice(index, index + 50), distance_arr.slice(index, index + 50)];
 }
 
+function getPowerColors(power, ftp, powerZones, powerColors) {
+    let colors = [];
+    for (let i = 0; i < power.length; i++) {
+        let powerFtpRatio = power[i]/ftp;
+        let currentZone = powerZones.find(zone => powerFtpRatio >= zone.from && (powerFtpRatio <= zone.to || zone.to === null));
+        colors.push(powerColors[currentZone.zone])
+    }
+    return colors;
+}
+
 export async function main() {
     common.initInteractionListeners();
     //common.initNationFlags();  // bg okay
@@ -134,28 +147,48 @@ export async function main() {
 
     common.subscribe('athlete/watching', watching => {
         if (watching.athleteId !== athleteId) {
-            console.log("Changed athlete ID!!!")
-            athlete_distance = []
-            athlete_power = []
-            target_power_data = []
-            prev_power_data = []
+            console.log("Changed athlete ID!!!");
+            athlete_distance = [];
+            athlete_power = [];
+            target_power_data = [];
+            prev_power_data = [];
             athleteId = watching.athleteId;
+            powerZones = null;
+            colors = null;
+            common.rpc.getPowerZones(watching.state.power/watching.athlete.ftp).then(zones =>{ powerZones = zones; colors = common.getPowerZoneColors(powerZones)});
         }
-        console.log(watching.state)
+        // console.log(watching.state)
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
         document.getElementById('current_power').innerHTML = watching.state.power
         document.getElementById('target_power').innerHTML = target_power
         if (Math.abs(watching.state.power - target_power) <= 10) {
-            document.getElementById('current_power').style.color = 'green'
+            document.getElementById('current_power').style.color = 'green';
         } else {
-            document.getElementById('current_power').style.color = 'red'
+            document.getElementById('current_power').style.color = 'red';
         }
-        athlete_power.push(watching.state.power)
-        athlete_distance.push(watching.state.distance)
-        let [target_power_arr, distance_arr] = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power)
+        athlete_power.push(watching.state.power);
+        athlete_distance.push(watching.state.distance);
+        let [target_power_arr, distance_arr] = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power);
 
         target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
         prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
+        power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, colors);
+        let series = target_power_data.map((item, index) => {
+            return {
+                data: [target_power_data[index - 1], item],
+                type: 'line',
+                showSymbol: false,
+                lineStyle: {
+                    color: power_color_data[index]
+                }
+            };
+        });
+        series.push({
+            data: prev_power_data,
+            type: 'line',
+            smooth: true,
+            showSymbol: false
+        });
 
         chart_options = {
             xAxis: {
@@ -183,19 +216,7 @@ export async function main() {
                     }
                 }
             },
-            series: [
-                {
-                    data: target_power_data,
-                    type: 'line',
-                    showSymbol: false
-                },
-                {
-                    data: prev_power_data,
-                    type: 'line',
-                    smooth: true,
-                    showSymbol: false
-                }
-            ]
+            series: series
         };
         chart.setOption(chart_options);
     });

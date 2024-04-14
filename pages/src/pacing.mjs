@@ -93,7 +93,7 @@ function get_target_power_array(distance, distance_arr, power_arr) {
             index = i;
         }
     }
-    return [power_arr.slice(index, index + 50), distance_arr.slice(index, index + 50)];
+    return [power_arr.slice(index -50, index + 50), distance_arr.slice(index -50, index + 50)];
 }
 
 function getPowerColors(power, ftp, powerZones, powerColors) {
@@ -152,6 +152,7 @@ export async function main() {
             athlete_power = [];
             target_power_data = [];
             prev_power_data = [];
+            power_color_data = [];
             athleteId = watching.athleteId;
             powerZones = null;
             colors = null;
@@ -180,6 +181,9 @@ export async function main() {
                 showSymbol: false,
                 lineStyle: {
                     color: power_color_data[index]
+                },
+                areaStyle: {
+                    color: power_color_data[index]
                 }
             };
         });
@@ -187,13 +191,18 @@ export async function main() {
             data: prev_power_data,
             type: 'line',
             smooth: true,
-            showSymbol: false
+            showSymbol: false,
+            lineStyle: {
+                width: 2,
+                color: 'black'
+            }
         });
 
         chart_options = {
             xAxis: {
                 type: 'value',
-                min: 'dataMin',
+                min: athlete_distance.slice(-100)[0],
+                max: distance_arr[-1],
                 name: 'Distance [m]',
                 splitLine: {
                     show: false

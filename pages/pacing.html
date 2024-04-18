@@ -13,38 +13,51 @@
             main();
         </script>
         <style>
-            #content {
+            #content_table, #content_chart {
                 overflow: hidden;
+                width: 100%;  
+                box-sizing: border-box; 
             }
             table {
                 width: 100%;
+                overflow: hidden;
             } 
             table td {
                 text-align: center !important;
                 width: 20%;
+                overflow: hidden;
             }
             td[heavy] {
                 font-weight: 600;
+                overflow: hidden;
             }
             table th {
                 text-align: center !important;
                 width: 20%;
+                overflow: hidden;
             }              
             table thead {
                 width: 100%; 
                 font-variant: all-small-caps;
+                overflow: hidden;
             }
             table tbody {
                 width: 100%;
+                overflow: hidden;
             }
             body {
                 overflow: hidden;
             }
             #chart_container {
-                height: 90vh;;
+                height: 80vh;;
                 width: 100vh;
                 vertical-align: middle;
                 overflow: hidden;
+            }
+            #current_power, #target_power {
+                width: 20vw; 
+                white-space: nowrap;
+                overflow: hidden; 
             }          
         </style>
         <link id="favicon" rel="shortcut icon" href="/pages/images/favicon.png"/>
@@ -66,7 +79,7 @@
                 </div>
             </header>
         </div>
-        <div id="content">
+        <div id="content_table">
             <table id="table" >
                 <thead>
                     <tr>
@@ -83,7 +96,7 @@
                 </tbody>
             </table>
         </div> 
-        <div id="content">
+        <div id="content_chart">
             <div id="chart_container"></div>
         </div>   
         <p id ='message_box'></p>

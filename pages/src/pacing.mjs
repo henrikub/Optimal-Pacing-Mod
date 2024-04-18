@@ -77,6 +77,8 @@ async function check_json_change() {
     cache = data;
     opt_results = cache
     document.getElementById('message_box').innerHTML = 'Reoptimized!'
+    target_power_data = [];
+    power_color_data = [];
   } else {
     document.getElementById('message_box').innerHTML = ''
   }
@@ -98,18 +100,40 @@ function get_target_power(distance, distance_arr, power_arr) {
     return power_arr[index];
 }
 
+// function get_target_power_array(distance, distance_arr, power_arr) {
+//     let index = 0;
+//     let min_diff = Math.abs(distance - distance_arr[0]);
+
+//     for (let i = 1; i < distance_arr.length; i++) {
+//         let difference = Math.abs(distance - distance_arr[i]);
+//         if (difference < min_diff) {
+//             min_diff = difference;
+//             index = i;
+//         }
+//     }
+//     return [power_arr.slice(index -50, index + 50), distance_arr.slice(index -50, index + 50)];
+// }
 function get_target_power_array(distance, distance_arr, power_arr) {
     let index = 0;
-    let min_diff = Math.abs(distance - distance_arr[0]);
-
-    for (let i = 1; i < distance_arr.length; i++) {
-        let difference = Math.abs(distance - distance_arr[i]);
-        if (difference < min_diff) {
-            min_diff = difference;
+    if (distance >= distance_arr) {
+        return null
+    }
+    for (let i = 0; i < distance_arr.length; i++) {
+        if (distance_arr[i] >= distance) {
             index = i;
+            break;
         }
     }
-    return [power_arr.slice(index -50, index + 50), distance_arr.slice(index -50, index + 50)];
+    let start = Math.max(0, index - 50);
+    let end;
+    if (distance_arr.slice(index, index + 50).length < 50) {
+        end = distance_arr.length;
+    } else {
+        end = Math.min(distance_arr.length, index + 50);
+    }
+    
+
+    return [power_arr.slice(start, end), distance_arr.slice(start, end)];
 }
 
 function getPowerColors(power, ftp, powerZones, powerColors) {
@@ -170,8 +194,6 @@ export async function main() {
             prev_power_data = [];
             power_color_data = [];
             athleteId = watching.athleteId;
-            powerZones = null;
-            colors = null;
             athlete_ftp = watching.athlete.ftp
             // common.rpc.getPowerZones(watching.state.power/watching.athlete.ftp).then(zones =>{ powerZones = zones; colors = common.getPowerZoneColors(powerZones)});
         }
@@ -191,13 +213,16 @@ export async function main() {
 
         target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
         prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
-        if (powerZones != null) {
+        if (target_power_arr != null) {
             power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, powerColors);
         }
-
-        let series
-        if (powerZones != null) {
-            series = target_power_data.map((item, index) => {
+        console.log("target power array lenth: ")
+        console.log(target_power_arr[target_power_arr.length -1])
+        console.log("prev power length")
+        console.log(prev_power_data[0])
+        let series = [];
+        if (target_power_arr != null && target_power_arr.length != 0) {
+            let target_series = target_power_data.map((item, index) => {
                 return {
                     data: [target_power_data[index - 1], item],
                     type: 'line',
@@ -210,16 +235,17 @@ export async function main() {
                     }
                 };
             });
-        } else {
-            series = {
-                data: target_power_data,
+            target_series.push({
+                data: [target_power_data[target_power_data.length - 1], null],
                 type: 'line',
                 showSymbol: false
-            }
+            });
+            series.push(...target_series);
         }
-
-        series.push({
-            data: prev_power_data,
+        
+        
+        let prev_power_series = {
+            data: [[null, null], ...prev_power_data],
             type: 'line',
             smooth: true,
             showSymbol: false,
@@ -227,13 +253,16 @@ export async function main() {
                 width: 2,
                 color: 'black'
             }
-        });
+        };
+        series.push(prev_power_series);
+        
+        
 
         chart_options = {
             xAxis: {
                 type: 'value',
                 min: athlete_distance.slice(-100)[0],
-                max: distance_arr[-1],
+                max: distance_arr[distance_arr.lenth - 1],
                 name: 'Distance [m]',
                 splitLine: {
                     show: false
@@ -258,7 +287,7 @@ export async function main() {
             },
             series: series
         };
-        chart.setOption(chart_options);
+        chart.setOption(chart_options, true);
     });
 }
 

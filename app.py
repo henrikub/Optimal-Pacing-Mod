@@ -73,7 +73,7 @@ if st.button("Run optimization"):
     N = round(distance[-1]/5)
     timegrid = np.linspace(0,round(distance[-1]/1000*150), N)
 
-    X, power, t_grid = create_initialization(timegrid, [distance[0], 1, params.get('w_prime')], distance, elevation, params)
+    X, power, t_grid = create_initialization_bin_search(timegrid, [distance[0], 1, params.get('w_prime')], distance, elevation, params)
     N = len(power)-1
     optimization_opts = {
         "N": N,

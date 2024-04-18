@@ -43,7 +43,7 @@ let gameConnection;
 
 common.settingsStore.setDefault({
     autoscroll: true,
-    refreshInterval: 1,
+    refreshInterval: 100,
     overlayMode: false,
     fontScale: 1,
     solidBackground: false,
@@ -262,7 +262,7 @@ export async function main() {
             xAxis: {
                 type: 'value',
                 min: athlete_distance.slice(-100)[0],
-                max: distance_arr[distance_arr.lenth - 1],
+                max: distance_arr[distance_arr.length - 1],
                 name: 'Distance [m]',
                 splitLine: {
                     show: false

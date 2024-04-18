@@ -19,7 +19,7 @@ st.title("Optimization settings")
 
 cp = st.number_input('CP', value=265)
 w_prime = st.number_input("W'", value=26630, min_value=1)
-route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Richmond Rollercoaster', 'Greater London Flat', 'Cobbled Climbs', 'Canopies and Coastlines', 'Two Bridges Loop'])
+route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Richmond Rollercoaster', 'Greater London Flat', 'Cobbled Climbs', 'Canopies and Coastlines', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['Euler', 'RK4', 'Midpoint'])
 

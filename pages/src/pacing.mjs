@@ -20,14 +20,30 @@ let athlete_distance = [];
 let target_power_data = [];
 let prev_power_data = [];
 let power_color_data = [];
-let powerZones;
-let colors;
+let athlete_ftp;
+
+const powerZones = [
+    {zone: 'Z1', from: 0, to: 0.5999},
+    {zone: 'Z2', from: 0.6, to: 0.7599},
+    {zone: 'Z3', from: 0.76, to: 0.8999},
+    {zone: 'Z4', from: 0.90, to: 1.0499},
+    {zone: 'Z5', from: 1.05, to: 1.1799},
+    {zone: 'Z6', from: 1.18, to: null}
+];
+const powerColors = {
+    Z1: '#8e8e86',
+    Z2: '#0b6ff4',
+    Z3: '#34bf34',
+    Z4: '#e5e541',
+    Z5: '#FF5F1F',
+    Z6: '#e20404' 
+};
 
 let gameConnection;
 
 common.settingsStore.setDefault({
     autoscroll: true,
-    refreshInterval: 2,
+    refreshInterval: 1,
     overlayMode: false,
     fontScale: 1,
     solidBackground: false,
@@ -156,9 +172,11 @@ export async function main() {
             athleteId = watching.athleteId;
             powerZones = null;
             colors = null;
-            common.rpc.getPowerZones(watching.state.power/watching.athlete.ftp).then(zones =>{ powerZones = zones; colors = common.getPowerZoneColors(powerZones)});
+            athlete_ftp = watching.athlete.ftp
+            // common.rpc.getPowerZones(watching.state.power/watching.athlete.ftp).then(zones =>{ powerZones = zones; colors = common.getPowerZoneColors(powerZones)});
         }
         // console.log(watching.state)
+
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
         document.getElementById('current_power').innerHTML = watching.state.power
         document.getElementById('target_power').innerHTML = target_power
@@ -173,20 +191,33 @@ export async function main() {
 
         target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
         prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
-        power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, colors);
-        let series = target_power_data.map((item, index) => {
-            return {
-                data: [target_power_data[index - 1], item],
+        if (powerZones != null) {
+            power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, powerColors);
+        }
+
+        let series
+        if (powerZones != null) {
+            series = target_power_data.map((item, index) => {
+                return {
+                    data: [target_power_data[index - 1], item],
+                    type: 'line',
+                    showSymbol: false,
+                    lineStyle: {
+                        color: power_color_data[index]
+                    },
+                    areaStyle: {
+                        color: power_color_data[index]
+                    }
+                };
+            });
+        } else {
+            series = {
+                data: target_power_data,
                 type: 'line',
-                showSymbol: false,
-                lineStyle: {
-                    color: power_color_data[index]
-                },
-                areaStyle: {
-                    color: power_color_data[index]
-                }
-            };
-        });
+                showSymbol: false
+            }
+        }
+
         series.push({
             data: prev_power_data,
             type: 'line',

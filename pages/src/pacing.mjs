@@ -1,11 +1,11 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
-import opt_result from './optimal_power.json' assert {type : 'json'};
+import opt_results_json from './optimal_power.json' assert {type : 'json'};
 const [echarts, theme] = await Promise.all([
     import('/pages/deps/src/echarts.mjs'),
     import('/pages/src/echarts-sauce-theme.mjs'),
 ]);
-let opt_results = opt_result
+let opt_results = opt_results_json
 
 const doc = document.documentElement;
 const L = sauce.locale;
@@ -37,6 +37,16 @@ const powerColors = {
     Z4: '#e5e541',
     Z5: '#FF5F1F',
     Z6: '#e20404' 
+};
+let prev_power_series = {
+    data: [[null, null]],
+    type: 'line',
+    smooth: true,
+    showSymbol: false,
+    lineStyle: {
+        width: 2,
+        color: 'black'
+    }
 };
 
 let gameConnection;
@@ -74,11 +84,13 @@ async function check_json_change() {
 
   if (JSON.stringify(data) !== JSON.stringify(cache)) {
     console.log('The JSON file has changed');
-    cache = data;
-    opt_results = cache
-    document.getElementById('message_box').innerHTML = 'Reoptimized!'
+    opt_results = data;
+    cache = opt_results;
+    document.getElementById('message_box').innerHTML = 'Reoptimized!';
     target_power_data = [];
     power_color_data = [];
+    console.log("start distance reopt");
+    console.log(opt_results.distance);
   } else {
     document.getElementById('message_box').innerHTML = ''
   }
@@ -113,6 +125,7 @@ function get_target_power(distance, distance_arr, power_arr) {
 //     }
 //     return [power_arr.slice(index -50, index + 50), distance_arr.slice(index -50, index + 50)];
 // }
+
 function get_target_power_array(distance, distance_arr, power_arr) {
     let index = 0;
     if (distance >= distance_arr) {
@@ -183,7 +196,7 @@ export async function main() {
 
     let chart = echarts.init(document.getElementById('chart_container'), 'sauce', {renderer: 'svg'});
     let chart_options;
-
+    
 
     common.subscribe('athlete/watching', watching => {
         if (watching.athleteId !== athleteId) {
@@ -195,7 +208,6 @@ export async function main() {
             power_color_data = [];
             athleteId = watching.athleteId;
             athlete_ftp = watching.athlete.ftp
-            // common.rpc.getPowerZones(watching.state.power/watching.athlete.ftp).then(zones =>{ powerZones = zones; colors = common.getPowerZoneColors(powerZones)});
         }
         // console.log(watching.state)
 
@@ -210,16 +222,22 @@ export async function main() {
         athlete_power.push(watching.state.power);
         athlete_distance.push(watching.state.distance);
         let [target_power_arr, distance_arr] = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power);
-
         target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
-        prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
-        if (target_power_arr != null) {
+        
+        if (prev_power_series.data.length >= 100) {
+            prev_power_data.shift();
+        }
+        prev_power_data.push([watching.state.distance, watching.state.power]);
+
+        // prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
+        prev_power_series.data = [[null, null], ...prev_power_data];
+        if (target_power_arr != null && athlete_ftp !=null) {
             power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, powerColors);
         }
-        console.log("target power array lenth: ")
-        console.log(target_power_arr[target_power_arr.length -1])
-        console.log("prev power length")
-        console.log(prev_power_data[0])
+        // console.log("target power array")
+        // console.log(target_power_arr[target_power_arr.length -1])
+        // console.log("prev power data")
+        // console.log(prev_power_data)
         let series = [];
         if (target_power_arr != null && target_power_arr.length != 0) {
             let target_series = target_power_data.map((item, index) => {
@@ -244,19 +262,8 @@ export async function main() {
         }
         
         
-        let prev_power_series = {
-            data: [[null, null], ...prev_power_data],
-            type: 'line',
-            smooth: true,
-            showSymbol: false,
-            lineStyle: {
-                width: 2,
-                color: 'black'
-            }
-        };
-        series.push(prev_power_series);
-        
-        
+
+        //series.push(prev_power_series);
 
         chart_options = {
             xAxis: {
@@ -285,8 +292,8 @@ export async function main() {
                     }
                 }
             },
-            series: series
         };
+        chart_options.series = [...series, prev_power_series]
         chart.setOption(chart_options, true);
     });
 }

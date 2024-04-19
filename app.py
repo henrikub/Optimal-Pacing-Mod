@@ -8,6 +8,7 @@ import json
 import random
 import sys
 import websocket
+import time 
 
 
 request_id = f'random-req-id-{random.randint(1, 100000000)}'
@@ -17,6 +18,7 @@ sub_id = f'random-sub-id-{random.randint(1, 100000000)}'
 
 st.title("Optimization settings")
 
+mass = st.number_input('Enter weight', value=78)
 cp = st.number_input('CP', value=265)
 w_prime = st.number_input("W'", value=26630, min_value=1)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Richmond Rollercoaster', 'Greater London Flat', 'Cobbled Climbs', 'Canopies and Coastlines', 'Two Bridges Loop', 'Park Perimeter Loop'])
@@ -48,7 +50,7 @@ if num_laps != 1:
 
 # Params
 params = {
-    'mass_rider': 78,
+    'mass_rider': mass,
     'mass_bike': 8,
     'g': 9.81,
     'mu': 0.004,
@@ -134,7 +136,6 @@ def on_message(ws, raw_msg):
             raise Exception('subscribe request failure')
     elif msg['type'] == 'event' and msg['success']:
         data = msg['data']
-        global athlete_state
         athlete_state = [data['state']['distance'], data['state']['speed']/3.6, data["stats"]["wBal"]]
         placeholder.text(f"Athlete state: {athlete_state}") 
         target_wbal = find_optimal_wbal(athlete_state[0])
@@ -149,7 +150,7 @@ def on_message(ws, raw_msg):
             N = round(dist[-1]/5)
             timegrid = np.linspace(0,round(dist[-1]/1000*150), N)
             try:
-                sim_X, power, t_grid = create_initialization(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
+                sim_X, power, t_grid = create_initialization_bin_search(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
             except:
                 print("something went wrong")
 
@@ -186,6 +187,7 @@ def on_message(ws, raw_msg):
             }
             with open('pages/src/optimal_power.json', 'w') as file:
                 json.dump(power_dict, file)
+            print("Start distance: ", power_dict['distance'][0])
             
 
 def on_error(ws, error):

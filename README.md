@@ -27,4 +27,11 @@ Run the following command to start the optimization settings interface
 python -m streamlit run app.py
 ```
 You will then be presented with the following display:  
-<img src="images/opt_display.png"/>
+<img src="images/opt_display.png" width=600px/>
+
+After specifying optimization settings, press the "Run optimization" button. The results will be displayed after the optimization routine is finished.
+<img src="images/opt_results.png" width=600px/>  
+
+You can now open the "Optimal Pacing" mod in S4Z and your target power will be shown with your powerzones based on your FTP.  
+<img src="images/pacing_mod.png" width=400px/>  
+If you want to reoptimize the power trajectory throughout the time trial, make sure to press the "Start Time Trial" button before the TT starts.  

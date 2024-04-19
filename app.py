@@ -8,7 +8,6 @@ import json
 import random
 import sys
 import websocket
-import time 
 
 
 request_id = f'random-req-id-{random.randint(1, 100000000)}'

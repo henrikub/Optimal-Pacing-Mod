@@ -1,69 +1,29 @@
-sauce4zwift-mod-example
+Sauce4zwift Optimal Pacing Mod
 ========
-An example implementation of a mod for Sauce for Zwift.
 
-<img src="yodawg.jpg"/>
-
-
-Basics
+How to install:
 --------
-A Sauce for Zwift "Mod" is a directory placed in `~/Documents/SauceMods`.  NOTE: "Documents"
-may be called "My Documents" on some platforms.  For first time mod users they should create
-an empty **SauceMods** folder first.  Then each Mod will be a sub directory in there such as...
+1. You need to have Sauce4Zwift installed on your computer: https://www.sauce.llc/products/sauce4zwift/download  
+
+2. Clone the repository 
+```
+git clone https://github.com/henrikub/s4z_pacing_mod.git
+```
+
+3. Place the folder inside a dedicated "SauceMods" folder within your Documents folder.
 ```
 Documents
 └── SauceMods
-    ├── neato_mod
-    └── super_duper_theme_mod
+    ├── s4z_pacing_mod
 ```
-
-Every Mod must contain a `manifest.json` file in the root path.  It must be PERFECT and
-look something like this...
-```json
-{
-    "manifest_version": 1,
-    "name": "The Neato Mod",
-    "description": "I make things neato",
-    "author": "Justin Mayfield",
-    "website_url": "https://saucellc.io",
-    "version": "0.0.1",
-    "content_js": [
-        "contents/run_everywhere.mjs"
-    ],
-    "content_css": [
-        "contents/see_everywhere.css"
-    ],
-    "web_root": "pages",
-    "windows": [{
-        "file": "pages/neato.html",
-        "query": {
-            "foo": "bar"
-        },
-        "id": "neato-fun",
-        "name": "Neato Mod",
-        "description": "I am a neato window.  Neato + Sauce = Fun",
-        "overlay": true,
-        "frame": true,
-        "default_bounds": {
-            "width": 0.5,
-            "height": 500,
-            "x": 100,
-            "y": -100
-        }
-    }]
-}
+4. Install the required Python packages with the following command:
 ```
-
-File paths and references must not use special characters or use parent directory syntax
-such as "../../../../etc/passwd".
-
-Then make sure you have files laid out roughly like this repo has them.  Keep in mind that
-the `web_root` is required for making the addon accessable from the Sauce web server. You
-should be careful to not put any sensitive data in that path.  If you omit it, then only
-native electron windows will be available.
-
-
-Advanced
+pip install -r requirements.txt
+```
+How to use:
 --------
-The `content_js` and `content_css` arrays in the manifest allow you to inject JS and CSS into ALL
-the windows.  Powerful but dangerous; be careful.
+Run the following command to start the optimization settings interface
+```
+python -m streamlit run app.py
+```
+You will then be presented with the following display:

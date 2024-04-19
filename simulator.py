@@ -46,7 +46,6 @@ def create_initialization(time, x0, distance, elevation, params):
     u = ca.MX.sym('u', 1)  
     f = system_dynamics(x, u)  
     ode = {'x': x, 'p': u, 'ode': f}  
-    opts = {'tf': dt} 
     F = ca.integrator('F', 'rk', ode, t0, dt)  
 
     done = False

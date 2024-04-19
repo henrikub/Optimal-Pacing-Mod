@@ -26,4 +26,5 @@ Run the following command to start the optimization settings interface
 ```
 python -m streamlit run app.py
 ```
-You will then be presented with the following display:
+You will then be presented with the following display:  
+<img src="images/opt_display.png"/>

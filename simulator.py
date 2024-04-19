@@ -41,12 +41,13 @@ def create_initialization(time, x0, distance, elevation, params):
 
 
     dt = tf/N  
+    t0 = 0
     x = ca.MX.sym('x', 3) 
     u = ca.MX.sym('u', 1)  
     f = system_dynamics(x, u)  
     ode = {'x': x, 'p': u, 'ode': f}  
     opts = {'tf': dt} 
-    F = ca.integrator('F', 'rk', ode, opts)  
+    F = ca.integrator('F', 'rk', ode, t0, dt)  
 
     done = False
     slope_const = 2500

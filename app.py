@@ -31,7 +31,12 @@ with open('routes.json', 'r') as file:
 
 distance = routes_dict[route_name]['distance']
 elevation = routes_dict[route_name]['elevation']
-# print(len(distance))
+lead_in = routes_dict[route_name]['lead_in']
+
+index_start = np.argwhere(np.array(distance) > lead_in)[0][0]
+distance = np.array(distance[index_start:-1]) - lead_in
+elevation = elevation[index_start:-1]
+
 if num_laps != 1:
     new_elevation = []
     new_distance = []
@@ -104,7 +109,6 @@ if st.button("Run optimization"):
     }
 
     message.empty()
-
     fig2 = plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_details, True)
     st.header("Optimization Results")
     st.pyplot(fig2)
@@ -112,7 +116,7 @@ if st.button("Run optimization"):
     power_dict = {
         'power': sol.value(U).tolist(),
         'time': t_grid.full().flatten().tolist(),
-        'distance': sol.value(X[0,:]).tolist(),
+        'distance': list(np.array(sol.value(X[0,:]).tolist()) + lead_in),
         'w_bal': sol.value(X[2,:]).tolist()
     }
     with open('pages/src/optimal_power.json', 'w') as file:

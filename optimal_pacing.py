@@ -107,7 +107,7 @@ def solve_opt_warmstart_sim(distance, elevation, params, optimization_opts, init
     opti.subject_to(opti.bounded(1, speed, 25))
 
     # Set boundary conditions
-    opti.subject_to(pos[0]==0) 
+    opti.subject_to(pos[0]==distance[0]) 
     opti.subject_to(speed[0]==1) 
     opti.subject_to(pos[-1]==distance[-1])
     opti.subject_to(w_bal[0]==w_prime)

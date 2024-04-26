@@ -4,9 +4,9 @@ import datetime
 def plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_details, streamlit=False):
     cp = params.get("cp")
     alpha = params.get("alpha")
-    alpha_c = params.get("alpha_c")
-    c_max = params.get("c_max")
-    c = params.get("c")
+    # alpha_c = params.get("alpha_c")
+    # c_max = params.get("c_max")
+    # c = params.get("c")
 
     optimal_power = sol.value(U)
     optimal_time = sol.value(T)
@@ -17,7 +17,8 @@ def plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_det
     # stats = sol.stats()
     # opt_time = stats['t_wall_total']
 
-    max_power = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    # max_power = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    max_power = alpha*w_bal + cp
     fig, ax = plt.subplots(3,1, figsize=(15,10))
 
     ax[0].set_title(f"The optimal time is {str(datetime.timedelta(seconds=round(optimal_time)))}")

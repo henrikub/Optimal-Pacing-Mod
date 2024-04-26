@@ -112,20 +112,6 @@ function get_target_power(distance, distance_arr, power_arr) {
     return power_arr[index];
 }
 
-// function get_target_power_array(distance, distance_arr, power_arr) {
-//     let index = 0;
-//     let min_diff = Math.abs(distance - distance_arr[0]);
-
-//     for (let i = 1; i < distance_arr.length; i++) {
-//         let difference = Math.abs(distance - distance_arr[i]);
-//         if (difference < min_diff) {
-//             min_diff = difference;
-//             index = i;
-//         }
-//     }
-//     return [power_arr.slice(index -50, index + 50), distance_arr.slice(index -50, index + 50)];
-// }
-
 function get_target_power_array(distance, distance_arr, power_arr) {
     let index = 0;
     if (distance >= distance_arr) {
@@ -228,16 +214,12 @@ export async function main() {
             prev_power_data.shift();
         }
         prev_power_data.push([watching.state.distance, watching.state.power]);
-
-        // prev_power_data = athlete_distance.slice(-100).map((x,i) => [x, athlete_power.slice(-100)[i]]);
+;
         prev_power_series.data = [[null, null], ...prev_power_data];
         if (target_power_arr != null && athlete_ftp !=null) {
             power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, powerColors);
         }
-        // console.log("target power array")
-        // console.log(target_power_arr[target_power_arr.length -1])
-        // console.log("prev power data")
-        // console.log(prev_power_data)
+
         let series = [];
         if (target_power_arr != null && target_power_arr.length != 0) {
             let target_series = target_power_data.map((item, index) => {
@@ -293,7 +275,11 @@ export async function main() {
                 }
             },
         };
-        chart_options.series = [...series, prev_power_series]
+        if (watching.state.distance === 0) {
+            chart_options.series = [...series]
+        } else {
+            chart_options.series = [...series, prev_power_series]
+        }
         chart.setOption(chart_options, true);
     });
 }

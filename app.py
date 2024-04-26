@@ -20,7 +20,8 @@ st.title("Optimization settings")
 mass = st.number_input('Enter weight', value=78)
 cp = st.number_input('CP', value=265)
 w_prime = st.number_input("W'", value=26630, min_value=1)
-route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Richmond Rollercoaster', 'Greater London Flat', 'Cobbled Climbs', 'Canopies and Coastlines', 'Two Bridges Loop', 'Park Perimeter Loop'])
+max_power = st.number_input('Max Power', value=700)
+route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['Euler', 'RK4', 'Midpoint'])
 
@@ -32,10 +33,6 @@ with open('routes.json', 'r') as file:
 distance = routes_dict[route_name]['distance']
 elevation = routes_dict[route_name]['elevation']
 lead_in = routes_dict[route_name]['lead_in']
-
-index_start = np.argwhere(np.array(distance) > lead_in)[0][0]
-distance = np.array(distance[index_start:-1]) - lead_in
-elevation = elevation[index_start:-1]
 
 if num_laps != 1:
     new_elevation = []
@@ -51,7 +48,7 @@ if num_laps != 1:
             elevation.pop(i+1)
 
 
-
+print("alpha: ", (max_power-cp)/w_prime)
 # Params
 params = {
     'mass_rider': mass,
@@ -68,10 +65,10 @@ params = {
     'eta': 1,
     'w_prime': w_prime,
     'cp': cp,
-    'alpha': 0.03,
-    'alpha_c': 0.01,
-    'c_max': 150,
-    'c': 80
+    'alpha': (max_power-cp)/w_prime
+    # 'alpha_c': 0.01,
+    # 'c_max': 150,
+    # 'c': 80
 }
 
 if st.button("Run optimization"):

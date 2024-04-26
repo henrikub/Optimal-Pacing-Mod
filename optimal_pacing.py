@@ -95,10 +95,11 @@ def solve_opt_warmstart_sim(distance, elevation, params, optimization_opts, init
 
     # Max power constraint params
     alpha = params.get("alpha")
-    alpha_c = params.get("alpha_c")
-    c_max = params.get("c_max")
-    c = params.get("c")
-    U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    # alpha_c = params.get("alpha_c")
+    # c_max = params.get("c_max")
+    # c = params.get("c")
+    #U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    U_max = alpha*w_bal + cp
 
     # Set the path constraints
     opti.subject_to(U <= U_max)
@@ -203,10 +204,11 @@ def reoptimize(distance, elevation, X0, params, optimization_opts, initializatio
 
     # Max power constraint params
     alpha = params.get("alpha")
-    alpha_c = params.get("alpha_c")
-    c_max = params.get("c_max")
-    c = params.get("c")
-    U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    # alpha_c = params.get("alpha_c")
+    # c_max = params.get("c_max")
+    # c = params.get("c")
+    #U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    U_max = alpha*w_bal + cp
 
     # Set the path constraints
     opti.subject_to(U <= U_max)
@@ -228,7 +230,7 @@ def reoptimize(distance, elevation, X0, params, optimization_opts, initializatio
     opti.set_initial(speed, initialization.get('speed_init'))
     opti.set_initial(w_bal, initialization.get('w_bal_init'))
     opti.set_initial(U, initialization.get('power_init'))
-
+ 
     p_opts = {"expand": False}
     s_opts = {"max_iter": 20000}
     opti.solver(optimization_opts.get('solver'), p_opts, s_opts) 

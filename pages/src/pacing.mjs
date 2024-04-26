@@ -67,7 +67,6 @@ if (window.isElectron) {
     doc.classList.toggle('overlay-mode', overlayMode);
     document.querySelector('#titlebar').classList.toggle('always-visible', overlayMode !== true);
     if (common.settingsStore.get('overlayMode') !== overlayMode) {
-        // Sync settings to our actual window state, not going to risk updating the window now
         common.settingsStore.set('overlayMode', overlayMode);
     }
 }
@@ -147,8 +146,6 @@ function getPowerColors(power, ftp, powerZones, powerColors) {
 
 export async function main() {
     common.initInteractionListeners();
-    //common.initNationFlags();  // bg okay
-  
     window.addEventListener('resize', function() {
         chart.resize();
     });
@@ -242,12 +239,9 @@ export async function main() {
             });
             series.push(...target_series);
         }
-        
-        
-
-        //series.push(prev_power_series);
 
         chart_options = {
+            animation: false,
             xAxis: {
                 type: 'value',
                 min: athlete_distance.slice(-100)[0],
@@ -276,9 +270,11 @@ export async function main() {
             },
         };
         if (watching.state.distance === 0) {
-            chart_options.series = [...series]
+            chart_options.series = [...series];
+        } else if (watching.state.distance >= distance_arr[distance_arr.length - 1]) {
+            chart_options.series = [];
         } else {
-            chart_options.series = [...series, prev_power_series]
+            chart_options.series = [...series, prev_power_series];
         }
         chart.setOption(chart_options, true);
     });

@@ -13,18 +13,15 @@ import websocket
 request_id = f'random-req-id-{random.randint(1, 100000000)}'
 sub_id = f'random-sub-id-{random.randint(1, 100000000)}'
 
-
-
 st.title("Optimization settings")
 
-mass = st.number_input('Enter weight', value=78)
-cp = st.number_input('CP', value=265)
-w_prime = st.number_input("W'", value=26630, min_value=1)
+mass = st.number_input('Enter weight', value=75)
+cp = st.number_input('CP', value=250)
+w_prime = st.number_input("W'", value=20000, min_value=1)
 max_power = st.number_input('Max Power', value=700)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
-integration_method = st.selectbox('Select integration method', ['Euler', 'RK4', 'Midpoint'])
-
+integration_method = st.selectbox('Select integration method', ['RK4', 'Euler', 'Midpoint'])
 
 routes_dict = {}
 with open('routes.json', 'r') as file:
@@ -47,8 +44,6 @@ if num_laps != 1:
             distance.pop(i+1)
             elevation.pop(i+1)
 
-
-print("alpha: ", (max_power-cp)/w_prime)
 # Params
 params = {
     'mass_rider': mass,
@@ -76,7 +71,7 @@ if st.button("Run optimization"):
     N = round(distance[-1]/5)
     timegrid = np.linspace(0,round(distance[-1]/1000*150), N)
 
-    X, power, t_grid = create_initialization_bin_search(timegrid, [distance[0], 1, params.get('w_prime')], distance, elevation, params)
+    X, power, t_grid = create_initialization(timegrid, [distance[0], 1, params.get('w_prime')], distance, elevation, params)
     N = len(power)-1
     optimization_opts = {
         "N": N,
@@ -94,7 +89,7 @@ if st.button("Run optimization"):
         'power_init': power,
         'time_init': timegrid[-1],
     }
-    sol, opti, T, U, X = solve_opt_warmstart_sim(distance, elevation, params, optimization_opts, initialization)
+    sol, opti, T, U, X = solve_opt(distance, elevation, params, optimization_opts, initialization)
     stats = sol.stats()
     opt_details = {
         "N": N,
@@ -138,10 +133,14 @@ def on_message(ws, raw_msg):
         data = msg['data']
         athlete_state = [data['state']['distance'], data['state']['speed']/3.6, data["stats"]["wBal"]]
         placeholder.text(f"Athlete state: {athlete_state}") 
+        if (distance[-1]- athlete_state[0]) < 300 or athlete_state[0] > distance[-1]:
+            return
+        
         target_wbal = find_optimal_wbal(athlete_state[0])
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
+
         if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 1: 
-            # Reoptimize if w_bal is more than 5k off target, distance is longer than 1k and speed > 1mps
+            # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 1
             print("Need to reoptimize!")
             index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]
             dist = distance[index:]
@@ -150,7 +149,7 @@ def on_message(ws, raw_msg):
             N = round(dist[-1]/5)
             timegrid = np.linspace(0,round(dist[-1]/1000*150), N)
             try:
-                sim_X, power, t_grid = create_initialization_bin_search(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
+                sim_X, power, t_grid = create_initialization(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
             except:
                 print("something went wrong")
 
@@ -187,7 +186,7 @@ def on_message(ws, raw_msg):
             }
             with open('pages/src/optimal_power.json', 'w') as file:
                 json.dump(power_dict, file)
-            print("Start distance: ", power_dict['distance'][0])
+
             
 
 def on_error(ws, error):

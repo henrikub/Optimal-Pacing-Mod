@@ -27,11 +27,20 @@ Run the following command to start the optimization settings interface
 python -m streamlit run app.py
 ```
 You will then be presented with the following display:  
+
 <img src="images/opt_display.png" width=600px/>
 
 After specifying optimization settings, press the "Run optimization" button. The results will be displayed after the optimization routine is finished.
+
 <img src="images/opt_results.png" width=600px/>  
 
-You can now open the "Optimal Pacing" mod in S4Z and your target power will be shown with your powerzones based on your FTP.  
+You can now open the "Optimal Pacing" mod in S4Z and your target power will be shown with your powerzones based on your FTP. 
+
 <img src="images/pacing_mod.png" width=400px/>  
-If you want to reoptimize the power trajectory throughout the time trial, make sure to press the "Start Time Trial" button before the TT starts.  
+
+If you want to reoptimize the power trajectory throughout the time trial, make sure to press the "Start Time Trial" button before the TT starts. The reoptimization uses the w'balance value from S4Z, so make sure the values for CP and W' are the same in the optimization settings and in S4Z.  
+
+Known issues:
+--------
+- Sometimes the cyclist's previous power output gets "redrawn" many times in a row instead of incrementing steadily. It usually goes away after a few seconds, but if it gets too annoying closing and reopening the window should fix it.
+- There might be inaccuracies regarding the lead-in distance at the beginning of a route. As a consequence, the target power graph might be displayed at slightly the position in the route. However, if you cross the start banner exactly when the target power graph starts, it should be accurate enough.

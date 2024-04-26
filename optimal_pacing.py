@@ -20,7 +20,7 @@ def smooth_w_balance_ode_derivative(u, cp, x, w_prime, smooth_factor=0.1):
     
     return transition * (-(u - cp)) + (1 - transition) * ((1 - x[2]/w_prime)*(cp - u))
 
-def solve_opt_warmstart_sim(distance, elevation, params, optimization_opts, initialization):
+def solve_opt(distance, elevation, params, optimization_opts, initialization):
     N = optimization_opts.get("N")
     opti = ca.Opti()
     X = opti.variable(3, N+1)

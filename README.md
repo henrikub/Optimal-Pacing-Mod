@@ -20,12 +20,16 @@ Documents
 ```
 pip install -r requirements.txt
 ```
+You might need to write 'pip3' instead of 'pip' depending on your Python environment.
+
 How to use:
 --------
 Run the following command to start the optimization settings interface
 ```
 python -m streamlit run app.py
 ```
+You might need to write 'python3' instead of 'python' depending on your Python environment.
+
 You will then be presented with the following display:  
 
 <img src="images/opt_display.png" width=600px/>
@@ -43,4 +47,4 @@ If you want to reoptimize the power trajectory throughout the time trial, make s
 Known issues:
 --------
 - Sometimes the cyclist's previous power output gets "redrawn" many times in a row instead of incrementing steadily. It usually goes away after a few seconds, but if it gets too annoying closing and reopening the window should fix it.
-- There might be inaccuracies regarding the lead-in distance at the beginning of a route. As a consequence, the target power graph might be displayed at slightly the position in the route. However, if you cross the start banner exactly when the target power graph starts, it should be accurate enough.
+- There might be inaccuracies regarding the lead-in distance at the beginning of a route. As a consequence, the target power graph being slightly mispositioned along the route. However, if you cross the start banner exactly when the target power graph starts, it should be accurate enough.

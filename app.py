@@ -23,6 +23,7 @@ max_power = st.number_input('Max Power (W)', value=700)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['RK4', 'Euler', 'Midpoint'])
+negative_split = st.checkbox('Negative split pacing', value=False)
 
 routes_dict = {}
 with open('routes.json', 'r') as file:
@@ -80,7 +81,8 @@ if st.button("Run optimization"):
         "smooth_power_constraint": True,
         "w_bal_model": "ODE",
         "integration_method": integration_method,
-        "solver": "ipopt"
+        "solver": "ipopt",
+        "negative_split": negative_split
     }
     
     initialization = {

@@ -107,6 +107,9 @@ def solve_opt(distance, elevation, params, optimization_opts, initialization):
     opti.subject_to(opti.bounded(0, w_bal, w_prime))
     opti.subject_to(opti.bounded(1, speed, 25))
 
+    if optimization_opts.get('negative_split'):
+        opti.subject_to(w_bal[0:round(N/2)] > w_prime/2)
+
     # Set boundary conditions
     opti.subject_to(pos[0]==distance[0]) 
     opti.subject_to(speed[0]==1) 

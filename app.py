@@ -15,10 +15,11 @@ sub_id = f'random-sub-id-{random.randint(1, 100000000)}'
 
 st.title("Optimization settings")
 
-mass = st.number_input('Enter weight', value=75)
-cp = st.number_input('CP', value=250)
-w_prime = st.number_input("W'", value=20000, min_value=1)
-max_power = st.number_input('Max Power', value=700)
+mass = st.number_input('Enter weight (kg)', value=75)
+height = st.number_input('Enter height (cm)', value=180)/100
+cp = st.number_input('CP (W)', value=250)
+w_prime = st.number_input("W' (J)", value=20000, min_value=1)
+max_power = st.number_input('Max Power (W)', value=700)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['RK4', 'Euler', 'Midpoint'])
@@ -56,7 +57,7 @@ params = {
     'r': 0.33,
     'Cd': 0.7,
     'rho': 1.2,
-    'A': 0.4,
+    'A': 0.0293*height**(0.725)*mass**(0.441) + 0.0604,
     'eta': 1,
     'w_prime': w_prime,
     'cp': cp,

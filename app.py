@@ -19,11 +19,11 @@ mass = st.number_input('Enter weight (kg)', value=75)
 height = st.number_input('Enter height (cm)', value=180)/100
 cp = st.number_input('CP (W)', value=250)
 w_prime = st.number_input("W' (J)", value=20000, min_value=1)
-max_power = st.number_input('Max Power (W)', value=700)
+max_power = st.number_input('Max 5-second Power (W)', value=700)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['RK4', 'Euler', 'Midpoint'])
-negative_split = st.checkbox('Negative split pacing', value=False)
+negative_split = st.toggle('Negative split pacing', value=False)
 
 routes_dict = {}
 with open('routes.json', 'r') as file:
@@ -116,6 +116,8 @@ if st.button("Run optimization"):
     }
     with open('pages/src/optimal_power.json', 'w') as file:
         json.dump(power_dict, file)
+
+
 
 placeholder = st.empty()
 placeholder2 = st.empty()

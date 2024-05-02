@@ -23,7 +23,15 @@ max_power = st.number_input('Max 5-second Power (W)', value=700)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['RK4', 'Euler', 'Midpoint'])
+
 negative_split = st.toggle('Negative split pacing', value=False)
+w_bal_start=0
+w_bal_end=0
+if negative_split:
+    st.write("The percentage of W' available increases linearly from the start to the end based on the values provided by the user.")
+    st.write("Example: Start percentage 90%, end percentage 5%: These settings enforce W'balance to stay above 90% at the start and above 5% at the finish.")
+    w_bal_start = st.slider("Lower bound on percentage of W' from the start", 0, 100, value=100)/100*w_prime
+    w_bal_end = st.slider("Lower bound on percentage of W' at the end", 0, 100, value=0)/100*w_prime
 
 routes_dict = {}
 with open('routes.json', 'r') as file:
@@ -82,7 +90,9 @@ if st.button("Run optimization"):
         "w_bal_model": "ODE",
         "integration_method": integration_method,
         "solver": "ipopt",
-        "negative_split": negative_split
+        "negative_split": negative_split,
+        "w_bal_start": w_bal_start,
+        "w_bal_end": w_bal_end
     }
     
     initialization = {

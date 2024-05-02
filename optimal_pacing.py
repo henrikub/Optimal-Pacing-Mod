@@ -108,7 +108,10 @@ def solve_opt(distance, elevation, params, optimization_opts, initialization):
     opti.subject_to(opti.bounded(1, speed, 25))
 
     if optimization_opts.get('negative_split'):
-        opti.subject_to(w_bal[0:round(N/2)] > w_prime/2)
+        w_bal_start = optimization_opts.get("w_bal_start")
+        w_bal_end = optimization_opts.get("w_bal_end")
+        x = ca.linspace(0,T,N+1)
+        opti.subject_to(w_bal > (w_bal_end-w_bal_start)/T *ca.transpose(x) + w_bal_start)
 
     # Set boundary conditions
     opti.subject_to(pos[0]==distance[0]) 

@@ -39,27 +39,32 @@ with open('routes.json', 'r') as file:
 
 distance = routes_dict[route_name]['distance']
 elevation = routes_dict[route_name]['elevation']
+friction = routes_dict[route_name]['friction']
 lead_in = routes_dict[route_name]['lead_in']
 
 if num_laps != 1:
     new_elevation = []
     new_distance = []
+    new_friction = []
     for i in range(num_laps):
         new_elevation.extend(elevation)
+        new_friction.extend(friction)
         new_distance.extend([elem + i*max(distance) for elem in distance])
     elevation = new_elevation
     distance = new_distance
+    friction = new_friction
     for i in range(len(distance)-10):
         if distance[i+1] - distance[i] < 0.6:
             distance.pop(i+1)
             elevation.pop(i+1)
+            friction.pop(i+1)
 
 # Params
 params = {
     'mass_rider': mass,
     'mass_bike': 8,
     'g': 9.81,
-    'mu': 0.004,
+    'mu': friction,
     'b0': 0.091,
     'b1': 0.0087,
     'Iw': 0.14,
@@ -154,8 +159,9 @@ def on_message(ws, raw_msg):
         target_wbal = find_optimal_wbal(athlete_state[0])
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
 
-        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 1: 
-            # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 1
+        always_false = False
+        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3 and always_false: # Remove always false!
+            # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 3
             print("Need to reoptimize!")
             index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]
             dist = distance[index:]

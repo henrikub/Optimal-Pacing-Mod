@@ -29,10 +29,10 @@ def create_initialization(time, x0, distance, elevation, params):
     slope = calculate_gradient(distance, smoothed_elev)
 
     interpolated_slope = ca.interpolant('Slope', 'bspline', [distance], slope)
-        
+    interpolated_friction = ca.interpolant('Friction', 'bspline', [distance], mu)
     def system_dynamics(x, u):
         return ca.vertcat(x[1], 
-                (1/x[1] * 1/(m + Iw/r**2)) * (eta*u - mu*m*g*x[1] - m*g*interpolated_slope(x[0])*x[1] - b0*x[1] - b1*x[1]**2 - 0.5*Cd*rho*A*x[1]**3),
+                (1/x[1] * 1/(m + Iw/r**2)) * (eta*u - interpolated_friction(x[0])*m*g*x[1] - m*g*interpolated_slope(x[0])*x[1] - b0*x[1] - b1*x[1]**2 - 0.5*Cd*rho*A*x[1]**3),
                 smooth_w_balance_ode_derivative(u, cp, x, w_prime)) 
 
     tf = time[-1]

@@ -159,8 +159,8 @@ def on_message(ws, raw_msg):
         target_wbal = find_optimal_wbal(athlete_state[0])
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
 
-        always_false = False
-        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3 and always_false: # Remove always false!
+      
+        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3: 
             # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 3
             print("Need to reoptimize!")
             index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]

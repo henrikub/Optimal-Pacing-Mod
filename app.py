@@ -62,7 +62,7 @@ if num_laps != 1:
 # Params
 params = {
     'mass_rider': mass,
-    'mass_bike': 8,
+    'mass_bike': 8.4,
     'g': 9.81,
     'mu': friction,
     'b0': 0.091,

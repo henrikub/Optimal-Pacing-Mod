@@ -13,12 +13,10 @@ def calculate_gradient(distance, elevation):
     gradient.append(0)
     return gradient
 
-
-def smooth_w_balance_ode_derivative(u, cp, x, w_prime, smooth_factor=0.1):
-    transition = ca.tanh(smooth_factor * (u - cp))
-    transition = 0.5 * (transition + 1)
+def smooth_w_balance_ode_derivative(u, cp, x, w_prime, smoothness=10):
+    transition = 0.5 + 0.5*ca.tanh((u - cp)/smoothness)
     
-    return transition * (-(u - cp)) + (1 - transition) * ((1 - x[2]/w_prime)*(cp - u))
+    return (1-transition)*(1-x[2]/w_prime)*(cp-u) + transition*(cp-u)
 
 def solve_opt(distance, elevation, params, optimization_opts, initialization):
     N = optimization_opts.get("N")

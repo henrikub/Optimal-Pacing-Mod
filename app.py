@@ -71,7 +71,8 @@ params = {
     'r': 0.33,
     'Cd': 0.7,
     'rho': 1.2,
-    'A': 0.0293*height**(0.725)*mass**(0.441) + 0.0604,
+    # 'A': 0.0293*height**(0.725)*mass**(0.441) + 0.0604,
+    'A': 0.4,
     'eta': 1,
     'w_prime': w_prime,
     'cp': cp,
@@ -159,7 +160,6 @@ def on_message(ws, raw_msg):
         target_wbal = find_optimal_wbal(athlete_state[0])
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
 
-      
         if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3: 
             # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 3
             print("Need to reoptimize!")

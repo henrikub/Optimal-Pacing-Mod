@@ -23,7 +23,7 @@ def create_initialization(time, x0, distance, elevation, params):
     w_prime = params.get("w_prime")
     cp = params.get("cp")
 
-    sigma = 4
+    sigma = 2
     smoothed_elev = gaussian_filter1d(elevation, sigma)
 
     slope = calculate_gradient(distance, smoothed_elev)

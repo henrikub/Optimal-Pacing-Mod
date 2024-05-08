@@ -1,4 +1,5 @@
 import casadi as ca
+import numpy as np
 from scipy.ndimage import gaussian_filter1d
 
 def calculate_gradient(distance, elevation):
@@ -17,6 +18,15 @@ def smooth_w_balance_ode_derivative(u, cp, x, w_prime, smoothness=10):
     transition = 0.5 + 0.5*ca.tanh((u - cp)/smoothness)
     
     return (1-transition)*(1-x[2]/w_prime)*(cp-u) + transition*(cp-u)
+
+def moving_avg(x, window_size):
+    return np.convolve(x, np.ones(window_size), 'valid') / window_size
+
+def normalized_power(power):
+    ma = moving_avg(power, 30)
+    ma_r = np.power(ma, 4)
+    avg = np.mean(ma_r)
+    return np.power(avg, 1/4)
 
 def solve_opt(distance, elevation, params, optimization_opts, initialization):
     N = optimization_opts.get("N")

@@ -97,41 +97,94 @@ async function check_json_change() {
 
 setInterval(check_json_change, 5000);
 
-function get_target_power(distance, distance_arr, power_arr) {
-    let index = 0;
-    let min_diff = Math.abs(distance - distance_arr[0]);
+// function get_target_power(distance, distance_arr, power_arr) {
+//     let index = 0;
+//     let min_diff = Math.abs(distance - distance_arr[0]);
 
-    for (let i = 1; i < distance_arr.length; i++) {
-        let difference = Math.abs(distance - distance_arr[i]);
-        if (difference < min_diff) {
-            min_diff = difference;
-            index = i;
+//     for (let i = 1; i < distance_arr.length; i++) {
+//         let difference = Math.abs(distance - distance_arr[i]);
+//         if (difference < min_diff) {
+//             min_diff = difference;
+//             index = i;
+//         }
+//     }
+//     return power_arr[index];
+// }
+
+function get_target_power(distance, distance_arr, power_arr) {
+    let start = 0;
+    let end = distance_arr.length - 1;
+
+    while (start <= end) {
+        let mid = Math.floor((start + end) / 2);
+        if (distance_arr[mid] === distance) {
+            return power_arr[mid];
+        } else if (distance_arr[mid] < distance) {
+            start = mid + 1;
+        } else {
+            end = mid - 1;
         }
     }
-    return power_arr[index];
+
+    if (start >= distance_arr.length) {
+        return power_arr[end];
+    } else if (end < 0) {
+        return power_arr[start];
+    } else {
+        return Math.abs(distance - distance_arr[start]) < Math.abs(distance - distance_arr[end]) ? power_arr[start] : power_arr[end];
+    }
 }
 
-function get_target_power_array(distance, distance_arr, power_arr) {
-    let index = 0;
-    if (distance >= distance_arr) {
-        return null
-    }
-    for (let i = 0; i < distance_arr.length; i++) {
-        if (distance_arr[i] >= distance) {
-            index = i;
-            break;
-        }
-    }
-    let start = Math.max(0, index - 50);
-    let end;
-    if (distance_arr.slice(index, index + 50).length < 50) {
-        end = distance_arr.length;
-    } else {
-        end = Math.min(distance_arr.length, index + 50);
-    }
+// function get_target_power_array(distance, distance_arr, power_arr) {
+//     let index = 0;
+//     if (distance >= distance_arr) {
+//         return null
+//     }
+//     for (let i = 0; i < distance_arr.length; i++) {
+//         if (distance_arr[i] >= distance) {
+//             index = i;
+//             break;
+//         }
+//     }
+//     let start = Math.max(0, index - 50);
+//     let end;
+//     if (distance_arr.slice(index, index + 50).length < 50) {
+//         end = distance_arr.length;
+//     } else {
+//         end = Math.min(distance_arr.length, index + 50);
+//     }
     
 
-    return [power_arr.slice(start, end), distance_arr.slice(start, end)];
+//     return [power_arr.slice(start, end), distance_arr.slice(start, end)];
+// }
+
+function get_target_power_array(distance, distance_arr, power_arr) {
+    let start = 0;
+    let end = distance_arr.length - 1;
+
+    while (start <= end) {
+        let mid = Math.floor((start + end) / 2);
+        if (distance_arr[mid] === distance) {
+            start = mid;
+            break;
+        } else if (distance_arr[mid] < distance) {
+            start = mid + 1;
+        } else {
+            end = mid - 1;
+        }
+    }
+
+    // If exact match not found, use the closest index
+    if (start >= distance_arr.length) {
+        start = end;
+    } else if (end < 0) {
+        start = 0;
+    }
+
+    let sliceStart = Math.max(0, start - 50);
+    let sliceEnd = Math.min(distance_arr.length, start + 50);
+
+    return [power_arr.slice(sliceStart, sliceEnd), distance_arr.slice(sliceStart, sliceEnd)];
 }
 
 function getPowerColors(power, ftp, powerZones, powerColors) {

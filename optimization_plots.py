@@ -1,5 +1,7 @@
 import matplotlib.pyplot as plt
 import datetime
+from optimal_pacing import normalized_power
+import numpy as np
 
 def plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_details, streamlit=False):
     cp = params.get("cp")
@@ -55,7 +57,8 @@ def plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_det
     ax3_twin.tick_params(axis='y', labelcolor='tab:red')
     ax3_twin.legend(["Elevation Profile"], loc='lower left')
 
-    fig.text(0.5, 0.02, f"Integration method: {opt_details.get('integration_method')}, points = {len(distance)}, N = {opt_details.get('N')}, W'balance model: {opt_details.get('w_bal_model')}, iterations: {opt_details.get('iterations')}, time: {str(datetime.timedelta(seconds=round(opt_details.get('opt_time'))))}", horizontalalignment="center")
+    fig.text(0.5, 0.04, f"Integration method: {opt_details.get('integration_method')}, points = {len(distance)}, N = {opt_details.get('N')}, W'balance model: {opt_details.get('w_bal_model')}, iterations: {opt_details.get('iterations')}, time: {str(datetime.timedelta(seconds=round(opt_details.get('opt_time'))))}", horizontalalignment="center")
+    fig.text(0.4, 0.02, f"Avg power: {round(np.mean(sol.value(U)))}W, Normalized Power: {round(normalized_power(sol.value(U)))}W")
 
     if streamlit:
         return fig

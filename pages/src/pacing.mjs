@@ -88,8 +88,7 @@ async function check_json_change() {
     document.getElementById('message_box').innerHTML = 'Reoptimized!';
     target_power_data = [];
     power_color_data = [];
-    console.log("start distance reopt");
-    console.log(opt_results.distance);
+
   } else {
     document.getElementById('message_box').innerHTML = ''
   }
@@ -135,29 +134,6 @@ function get_target_power(distance, distance_arr, power_arr) {
     }
 }
 
-// function get_target_power_array(distance, distance_arr, power_arr) {
-//     let index = 0;
-//     if (distance >= distance_arr) {
-//         return null
-//     }
-//     for (let i = 0; i < distance_arr.length; i++) {
-//         if (distance_arr[i] >= distance) {
-//             index = i;
-//             break;
-//         }
-//     }
-//     let start = Math.max(0, index - 50);
-//     let end;
-//     if (distance_arr.slice(index, index + 50).length < 50) {
-//         end = distance_arr.length;
-//     } else {
-//         end = Math.min(distance_arr.length, index + 50);
-//     }
-    
-
-//     return [power_arr.slice(start, end), distance_arr.slice(start, end)];
-// }
-
 function get_target_power_array(distance, distance_arr, power_arr) {
     let start = 0;
     let end = distance_arr.length - 1;
@@ -173,8 +149,6 @@ function get_target_power_array(distance, distance_arr, power_arr) {
             end = mid - 1;
         }
     }
-
-    // If exact match not found, use the closest index
     if (start >= distance_arr.length) {
         start = end;
     } else if (end < 0) {
@@ -183,7 +157,6 @@ function get_target_power_array(distance, distance_arr, power_arr) {
 
     let sliceStart = Math.max(0, start - 50);
     let sliceEnd = Math.min(distance_arr.length, start + 50);
-
     return [power_arr.slice(sliceStart, sliceEnd), distance_arr.slice(sliceStart, sliceEnd)];
 }
 
@@ -191,11 +164,14 @@ function getPowerColors(power, ftp, powerZones, powerColors) {
     let colors = [];
     for (let i = 0; i < power.length; i++) {
         let powerFtpRatio = power[i]/ftp;
-        let currentZone = powerZones.find(zone => powerFtpRatio >= zone.from && (powerFtpRatio <= zone.to || zone.to === null));
-        colors.push(powerColors[currentZone.zone])
+        let closestZone = powerZones.reduce((prev, curr) => {
+            return (Math.abs(curr.from - powerFtpRatio) < Math.abs(prev.from - powerFtpRatio) ? curr : prev);
+        });
+        colors.push(powerColors[closestZone.zone]);
     }
     return colors;
 }
+
 
 export async function main() {
     common.initInteractionListeners();

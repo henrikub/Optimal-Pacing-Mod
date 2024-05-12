@@ -96,20 +96,6 @@ async function check_json_change() {
 
 setInterval(check_json_change, 5000);
 
-// function get_target_power(distance, distance_arr, power_arr) {
-//     let index = 0;
-//     let min_diff = Math.abs(distance - distance_arr[0]);
-
-//     for (let i = 1; i < distance_arr.length; i++) {
-//         let difference = Math.abs(distance - distance_arr[i]);
-//         if (difference < min_diff) {
-//             min_diff = difference;
-//             index = i;
-//         }
-//     }
-//     return power_arr[index];
-// }
-
 function get_target_power(distance, distance_arr, power_arr) {
     let start = 0;
     let end = distance_arr.length - 1;

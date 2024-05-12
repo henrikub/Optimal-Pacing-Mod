@@ -23,7 +23,8 @@ max_power = st.number_input('Max 5-second Power (W)', value=700)
 route_name = st.selectbox('Select route', ['Mech Isle Loop', 'Hilly Route', 'Downtown Titans', 'Cobbled Climbs', 'Two Bridges Loop', 'Park Perimeter Loop'])
 num_laps = st.number_input('Number of Laps', value=1)
 integration_method = st.selectbox('Select integration method', ['RK4', 'Euler', 'Midpoint'])
-
+reopt_count = 0
+last_reopt = 0
 negative_split = st.toggle('Negative split pacing', value=False)
 w_bal_start=0
 w_bal_end=0
@@ -159,20 +160,24 @@ def on_message(ws, raw_msg):
         
         target_wbal = find_optimal_wbal(athlete_state[0])
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
+        global reopt_count
+        global last_reopt
 
-        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3: 
+        if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3 and (athlete_state[0]-last_reopt)>2000: 
             # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 3
             print("Need to reoptimize!")
             index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]
             dist = distance[index:]
             dist = [elem - distance[index] for elem in dist] # Shifting to start from 0
             elev = elevation[index:]
+            params['mu'] = friction[index:]
+            last_reopt = athlete_state[0]
             N = round(dist[-1]/5)
             timegrid = np.linspace(0,round(dist[-1]/1000*150), N)
             try:
                 sim_X, power, t_grid = create_initialization(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
             except:
-                print("something went wrong")
+                print("Something went wrong")
 
             N = len(power)-1
             optimization_opts = {
@@ -180,7 +185,7 @@ def on_message(ws, raw_msg):
                 "time_initial_guess": t_grid[-1],
                 "smooth_power_constraint": True,
                 "w_bal_model": "ODE",
-                "integration_method": "Euler",
+                "integration_method": "RK4",
                 "solver": "ipopt"
             }
             initialization = {
@@ -207,6 +212,11 @@ def on_message(ws, raw_msg):
             }
             with open('pages/src/optimal_power.json', 'w') as file:
                 json.dump(power_dict, file)
+            
+            reopt_count += 1
+            filename = 'reoptimizations/reopt' + str(reopt_count) + '.json'
+            with open(filename, 'w') as f:
+                json.dump(power_dict, f)
 
             
 

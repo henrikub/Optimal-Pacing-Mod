@@ -108,7 +108,7 @@ def solve_opt(distance, elevation, params, optimization_opts, initialization):
     # alpha_c = params.get("alpha_c")
     # c_max = params.get("c_max")
     # c = params.get("c")
-    #U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
+    # U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
     U_max = alpha*w_bal + cp
 
     # Set the path constraints

@@ -14,6 +14,7 @@ const num = H.number;
 let imperial = common.storage.get('/imperialUnits');
 L.setImperial(imperial);
 
+let lead_in = 0;
 let athleteId;
 let athlete_power = [];
 let athlete_distance = [];
@@ -78,12 +79,14 @@ function render() {
 let cache = null;
 
 async function check_json_change() {
-  const response = await fetch('src/optimal_power.json');
-  const data = await response.json();
+    const response = await fetch('src/optimal_power.json');
+    const data = await response.json();
+    data.distance = data.distance.map(element => element + lead_in)
 
   if (JSON.stringify(data) !== JSON.stringify(cache)) {
-    console.log('The JSON file has changed');
+    console.log(opt_results.distance[0]);
     opt_results = data;
+    // opt_results.distance = opt_results.distance.map(element => element + lead_in);
     cache = opt_results;
     document.getElementById('message_box').innerHTML = 'Reoptimized!';
     target_power_data = [];
@@ -206,8 +209,10 @@ export async function main() {
             power_color_data = [];
             athleteId = watching.athleteId;
             athlete_ftp = watching.athlete.ftp
+            lead_in = 0;
         }
         // console.log(watching.state)
+        
 
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
         document.getElementById('current_power').innerHTML = watching.state.power
@@ -219,6 +224,7 @@ export async function main() {
         }
         athlete_power.push(watching.state.power);
         athlete_distance.push(watching.state.distance);
+
         let [target_power_arr, distance_arr] = get_target_power_array(watching.state.distance, opt_results.distance, opt_results.power);
         target_power_data = distance_arr.map((x, i) => [x, target_power_arr[i]]);
         
@@ -226,7 +232,7 @@ export async function main() {
             prev_power_data.shift();
         }
         prev_power_data.push([watching.state.distance, watching.state.power]);
-;
+
         prev_power_series.data = [[null, null], ...prev_power_data];
         if (target_power_arr != null && athlete_ftp !=null) {
             power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, powerColors);
@@ -292,6 +298,12 @@ export async function main() {
             chart_options.series = [...series, prev_power_series];
         }
         chart.setOption(chart_options, true);
+    });
+    document.getElementById('startButton').addEventListener('click', function() {
+        console.log(athlete_distance[athlete_distance.length -1]);
+        lead_in = athlete_distance[athlete_distance.length -1] + 5;
+        opt_results.distance = opt_results.distance.map(element => element + lead_in);
+        this.style.display = 'none';
     });
 }
 

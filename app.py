@@ -128,7 +128,7 @@ if st.button("Run optimization"):
     power_dict = {
         'power': sol.value(U).tolist(),
         'time': t_grid.full().flatten().tolist(),
-        'distance': list(np.array(sol.value(X[0,:]).tolist()) + lead_in),
+        'distance': list(np.array(sol.value(X[0,:]).tolist())),
         'w_bal': sol.value(X[2,:]).tolist()
     }
     with open('pages/src/optimal_power.json', 'w') as file:
@@ -153,12 +153,12 @@ def on_message(ws, raw_msg):
             raise Exception('subscribe request failure')
     elif msg['type'] == 'event' and msg['success']:
         data = msg['data']
-        athlete_state = [data['state']['distance'], data['state']['speed']/3.6, data["stats"]["wBal"]]
+        athlete_state = [data['state']['distance'] - lead_in, data['state']['speed']/3.6, data["stats"]["wBal"]]
         placeholder.text(f"Athlete state: {athlete_state}") 
         if (distance[-1]- athlete_state[0]) < 300 or athlete_state[0] > distance[-1]:
             return
         
-        target_wbal = find_optimal_wbal(athlete_state[0])
+        target_wbal = find_optimal_wbal(athlete_state[0] - lead_in)
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
         global reopt_count
         global last_reopt
@@ -202,12 +202,10 @@ def on_message(ws, raw_msg):
                 print("something went wrong")
             t_grid = ca.linspace(0, reopt_sol.value(reopt_T), N+1)
             pos = np.array(reopt_sol.value(reopt_X[0,:])) + distance[index] # Shift back to original
-            dist = [elem + distance[index] for elem in dist]
-            reopt_X[0,:] = pos
             power_dict = {
                 'power': reopt_sol.value(reopt_U).tolist(),
                 'time': t_grid.full().flatten().tolist(),
-                'distance': list(np.array(reopt_sol.value(reopt_X[0,:]).tolist()) + lead_in),
+                'distance': pos.tolist(),
                 'w_bal': reopt_sol.value(reopt_X[2,:]).tolist()
             }
             with open('pages/src/optimal_power.json', 'w') as file:

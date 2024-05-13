@@ -185,7 +185,7 @@ def on_message(ws, raw_msg):
                 "time_initial_guess": t_grid[-1],
                 "smooth_power_constraint": True,
                 "w_bal_model": "ODE",
-                "integration_method": "RK4",
+                "integration_method": "Euler",
                 "solver": "ipopt"
             }
             initialization = {
@@ -207,7 +207,7 @@ def on_message(ws, raw_msg):
             power_dict = {
                 'power': reopt_sol.value(reopt_U).tolist(),
                 'time': t_grid.full().flatten().tolist(),
-                'distance': reopt_sol.value(reopt_X[0,:]).tolist(),
+                'distance': list(np.array(reopt_sol.value(reopt_X[0,:]).tolist()) + lead_in),
                 'w_bal': reopt_sol.value(reopt_X[2,:]).tolist()
             }
             with open('pages/src/optimal_power.json', 'w') as file:

@@ -158,13 +158,17 @@ def on_message(ws, raw_msg):
         if (distance[-1]- athlete_state[0]) < 300 or athlete_state[0] > distance[-1]:
             return
         
-        target_wbal = find_optimal_wbal(athlete_state[0] - lead_in)
+        target_wbal = find_optimal_wbal(athlete_state[0] + lead_in)
         placeholder2.text(f"Optimal wbal:  {target_wbal}")
         global reopt_count
         global last_reopt
 
         if np.abs(athlete_state[2] - target_wbal) > 3000 and athlete_state[0] > 1000 and athlete_state[1] > 3 and (athlete_state[0]-last_reopt)>2000: 
             # Reoptimize if w_bal is more than 3kJ off target, distance is longer than 1k and speed > 3
+            with open('pages/src/optimal_power.json', 'r') as file:
+                opt_results = json.load(file)
+                lead_in = opt_results['lead_in']
+
             print("Need to reoptimize!")
             index = np.argwhere(np.array(distance) > athlete_state[0])[0][0]
             dist = distance[index:]
@@ -174,6 +178,8 @@ def on_message(ws, raw_msg):
             last_reopt = athlete_state[0]
             N = round(dist[-1]/5)
             timegrid = np.linspace(0,round(dist[-1]/1000*150), N)
+
+            athlete_state[0] -= lead_in
             try:
                 sim_X, power, t_grid = create_initialization(timegrid, [dist[0], athlete_state[1], athlete_state[2]], dist, elev, params)
             except:

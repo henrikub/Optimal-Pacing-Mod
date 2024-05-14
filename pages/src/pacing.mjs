@@ -1,6 +1,7 @@
 import * as sauce from '/pages/src/../../shared/sauce/index.mjs';
 import * as common from '/pages/src/common.mjs';
 import opt_results_json from './optimal_power.json' assert {type : 'json'};
+
 const [echarts, theme] = await Promise.all([
     import('/pages/deps/src/echarts.mjs'),
     import('/pages/src/echarts-sauce-theme.mjs'),
@@ -53,13 +54,28 @@ let prev_power_series = {
 let gameConnection;
 
 common.settingsStore.setDefault({
+    route: "Mech Isle Loop",
+    cp: 250,
+    w_prime: 20000,
+    weight: 75,
+    max_power: 700,
+    num_laps: 1,
+    integration_method: "RK4",
+    negative_split: false,
+    bound_start: 90,
+    bound_end: 0,
     autoscroll: true,
     refreshInterval: 100,
     overlayMode: false,
     fontScale: 1,
     solidBackground: false,
     backgroundColor: '#00ff00',
+
 });
+
+const settings = common.settingsStore.get();
+setBackground();
+console.log(settings)
 
 
 let overlayMode;
@@ -98,6 +114,42 @@ async function check_json_change() {
 }
 
 setInterval(check_json_change, 5000);
+
+async function check_run_opt_button() {
+    if (localStorage.getItem('optButtonClicked') === 'true') {
+        console.log("opt button clicked")
+
+        let opt_config = {
+            route: settings.route,
+            cp: settings.cp,
+            w_prime: settings.w_prime,
+            num_laps: settings.num_laps,
+            weight: settings.weight,
+            max_power: settings.max_power,
+            integration_method: settings.integration_method,
+            negative_split: settings.negative_split,
+            bound_start: settings.bound_start,
+            bound_end: settings.bound_end
+        };
+        fetch('http://localhost:5000/runopt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(opt_config),
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log('Success:', data);
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+        localStorage.setItem('optButtonClicked', 'false');
+    }
+}
+
+setInterval(check_run_opt_button, 3000)
 
 function get_target_power(distance, distance_arr, power_arr) {
     let start = 0;
@@ -299,26 +351,45 @@ export async function main() {
         }
         chart.setOption(chart_options, true);
     });
+
     document.getElementById('startButton').addEventListener('click', function() {
-        console.log(athlete_distance[athlete_distance.length -1]);
-        lead_in = athlete_distance[athlete_distance.length -1] + 5;
-        opt_results.distance = opt_results.distance.map(element => element + lead_in);
-        this.style.display = 'none';
+    console.log(athlete_distance[athlete_distance.length -1]);
+    lead_in = athlete_distance[athlete_distance.length -1] + 5;
+    opt_results.distance = opt_results.distance.map(element => element + lead_in);
+        
+        // Prepare the data to be sent to the server
+        // const data = { lead_in: 21 };
+
+    //     // Send the data to the server using the Fetch API
+    //     fetch('http://localhost:5000/startbanner', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(data),
+    //     })
+    //     .then(response => response.json())
+    //     .then(data => {
+    //         console.log('Success:', data);
+    //     })
+    //     .catch((error) => {
+    //         console.error('Error:', error);
+    //     });
+    //     console.log(settings)
+        
     });
 }
 
 function setBackground() {
-    const {solidBackground, backgroundColor} = common.settingsStore.get();
-    doc.classList.toggle('solid-background', !!solidBackground);
-    if (solidBackground) {
-        doc.style.setProperty('--background-color', backgroundColor);
+    doc.classList.toggle('solid-background', !!settings.solidBackground);
+    if (settings.solidBackground) {
+        doc.style.setProperty('--background-color', settings.backgroundColor);
     } else {
         doc.style.removeProperty('--background-color');
     }
 }
 
-
 export async function settingsMain() {
     common.initInteractionListeners();
-    await common.initSettingsForm('form#general')();
+    await common.initSettingsForm('form')();
 }

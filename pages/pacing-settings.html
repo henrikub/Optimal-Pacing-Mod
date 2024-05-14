@@ -13,7 +13,7 @@
         <link rel="stylesheet" href="/pages/css/watching.css"/>
 
         <script type="module">
-            import {settingsMain} from './src/states.mjs';
+            import {settingsMain} from './src/pacing.mjs';
             settingsMain();
         </script>
     </head>
@@ -21,7 +21,7 @@
         <div id="titlebar">
             <header>
                 <div class="logo"><img title="icon" src="/pages/images/icon128.png"/></div>
-                <div class="title">Mod: Pacing - Settings</div>
+                <div class="title">Optimal Pacing - Settings</div>
                 <div class="filler"></div>
                 <div class="buttons">
                     <div title="Close this window" class="button close electron-only"><ms>close</ms></div>
@@ -29,11 +29,24 @@
             </header>
         </div>
         <div id="settings">
-            <form id="general" class="section">
-                <div class="title">General</div>
+            <div class="title">General</div>
+            <hr>
+            <form id="opt_settings">
                 <label>
                     <key>Theme override:</key>
-                    <select is="sauce-theme" override></select>
+                    <select name="themeOverride">
+                        <option value="">Use app setting</option>
+                        <option value="sauce">Sauce</option>
+                        <option value="bluepink">Ice Blue Pink</option>
+                        <option value="green">Green Lantern</option>
+                        <option value="burgundy">Ron Burgundy</option>
+                        <option value="aqua">Aqua Salad</option>
+                        <option value="watermelon">Watermelon</option>
+                        <option value="light">Light</option>
+                        <option value="dark">Dark</option>
+                        <option value="transparent-light">Transparent - Light</option>
+                        <option value="transparent-dark">Transparent - Dark</option>
+                    </select>
                 </label>
                 <label title="Mostly useful for streamers using OBS window and browser sources">
                     <key>Solid background:</key>
@@ -43,8 +56,72 @@
                     <key>Background color:</key>
                     <input type="color" name="backgroundColor" data-depends-on="solidBackground"/>
                     <input type="text" name="backgroundColor" data-depends-on="solidBackground" size="7"/>
-                </label>                                                                         
+                </label>
+                <hr>
+                <p class="space"></p>
+                <div class="title">Optimization Settings</div>
+                <hr>
+                <label>
+                    <key>Select a route</key>
+                    <select name="route">
+                        <option value="mech_isle_loop" >Mech Isle Loop</option>
+                        <option value="hilly_route">Hilly Route</option>
+                        <option value="cobbled_climbs">Cobbled Climbs</option>
+                        <option value="park_perimeter_loop">Park Perimeter Loop</option>
+                        <option value="downtown_titans">Downtown Ttitans</option>
+                        <option value="two_bridges_loop">Two Bridges Loop</option>
+                    </select>
+                </label>
+                <label>
+                    <key>Weight</key>
+                    <input type="number" name="weight" min="1" max="1000"/>
+                </label>
+                <label>
+                    <key>CP</key>
+                    <input type="number" name="cp" min="1" max="10000"/>
+                </label>
+                <label>
+                    <key>W'</key>
+                    <input type="number" name="w_prime" min="1" max="100000"/>
+                </label>
+                <label>
+                    <key>Max 5-second power output</key>
+                    <input type="number" name="max_power" min="1" max="100000"/>
+                </label>
+                <label>
+                    <key>Number of laps</key>
+                    <input type="number" name="num_laps" min="1" max="100"/>
+                </label>
+                <label>
+                    <key>Integration method</key>
+                    <select name="integration_method">
+                        <option value="RK4">RK4</option>
+                        <option value="Euler">Euler</option>
+                        <option value="Midpoint">Midpoint</option>
+                    </select>
+                </label>
+                <label>
+                    <key>Negative Split Pacing</key>
+                    <input type="checkbox" id="negative_split" name="negative_split">
+                    <div id="slidersContainer"></div>
+                </label>
+                <label>
+                    <key>Lower bound at the start</key>
+                    <input type="range" min="0" max="100" value="100" name="bound_start">
+                </label>
+                <label>
+                    <key>Lower bound at the end</key>
+                    <input type="range" min="0" max="100" value="0" name="bound_end">
+                </label>
+                
+                <hr>
+                <button id="runOptimization">Run Optimization</button>
             </form>
         </div>
+        <script>
+            document.getElementById('runOptimization').addEventListener('click', function() {
+                localStorage.setItem('optButtonClicked', 'true');
+            });
+        </script>
     </body>
 </html>

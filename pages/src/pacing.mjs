@@ -23,6 +23,8 @@ let target_power_data = [];
 let prev_power_data = [];
 let power_color_data = [];
 let athlete_ftp;
+let last_reopt = 0;
+let reopt_count = 0;
 
 const powerZones = [
     {zone: 'Z1', from: 0, to: 0.5999},
@@ -62,6 +64,7 @@ common.settingsStore.setDefault({
     num_laps: 1,
     integration_method: "RK4",
     negative_split: false,
+    reoptimization: false,
     bound_start: 90,
     bound_end: 0,
     autoscroll: true,
@@ -75,8 +78,6 @@ common.settingsStore.setDefault({
 
 const settings = common.settingsStore.get();
 setBackground();
-console.log(settings)
-
 
 let overlayMode;
 if (window.isElectron) {
@@ -100,7 +101,7 @@ async function check_json_change() {
     data.distance = data.distance.map(element => element + lead_in)
 
   if (JSON.stringify(data) !== JSON.stringify(cache)) {
-    console.log(opt_results.distance[0]);
+
     opt_results = data;
     // opt_results.distance = opt_results.distance.map(element => element + lead_in);
     cache = opt_results;
@@ -174,6 +175,31 @@ function get_target_power(distance, distance_arr, power_arr) {
         return Math.abs(distance - distance_arr[start]) < Math.abs(distance - distance_arr[end]) ? power_arr[start] : power_arr[end];
     }
 }
+
+function get_optimal_wbal(distance, distance_arr, w_bal_arr) {
+    let start = 0;
+    let end = distance_arr.length - 1;
+
+    while (start <= end) {
+        let mid = Math.floor((start + end) / 2);
+        if (distance_arr[mid] === distance) {
+            return w_bal_arr[mid];
+        } else if (distance_arr[mid] < distance) {
+            start = mid + 1;
+        } else {
+            end = mid - 1;
+        }
+    }
+
+    if (start >= distance_arr.length) {
+        start = distance_arr.length - 1;
+    } 
+    if (end < 0) {
+        end = 0;
+    }
+    return Math.abs(distance - distance_arr[start]) < Math.abs(distance - distance_arr[end]) ? w_bal_arr[start] : w_bal_arr[end];
+}
+
 
 function get_target_power_array(distance, distance_arr, power_arr) {
     let start = 0;
@@ -263,12 +289,14 @@ export async function main() {
             athlete_ftp = watching.athlete.ftp
             lead_in = 0;
         }
-        // console.log(watching.state)
+        // console.log(watching)
         
 
-        let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power))
-        document.getElementById('current_power').innerHTML = watching.state.power
-        document.getElementById('target_power').innerHTML = target_power
+        let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power));
+        let target_wbal = get_optimal_wbal(watching.state.distance-lead_in, opt_results.distance, opt_results.w_bal);
+        document.getElementById('current_power').innerHTML = watching.state.power;
+        document.getElementById('target_power').innerHTML = target_power;
+        document.getElementById('optimal_wbal').innerHTML = Math.round(target_wbal);
         if (Math.abs(watching.state.power - target_power) <= 10) {
             document.getElementById('current_power').style.color = 'green';
         } else {
@@ -342,6 +370,48 @@ export async function main() {
                 }
             },
         };
+        
+        // console.log('*****************************')
+        // console.log(settings.reoptimization);
+        // console.log(watching.state.distance);
+        // console.log(Math.abs(watching.wBal-target_wbal))
+        // console.log('*****************************')
+        if (settings.reoptimization === true && watching.state.distance > 1000 && Math.abs(watching.wBal-target_wbal)>3000 && (watching.state.distance - last_reopt) > 1000 && watching.state.distance < opt_results.distance[opt_results.distance.length-1]) {
+            console.log("Need to reoptimize!");
+            last_reopt = watching.state.distance
+            reopt_count = reopt_count + 1;
+            let opt_config = {
+                route: settings.route,
+                cp: settings.cp,
+                w_prime: settings.w_prime,
+                num_laps: settings.num_laps,
+                weight: settings.weight,
+                max_power: settings.max_power,
+                integration_method: settings.integration_method,
+                negative_split: settings.negative_split,
+                bound_start: settings.bound_start,
+                bound_end: settings.bound_end,
+                distance: watching.state.distance - lead_in,
+                speed: watching.state.speed/3.6,
+                w_bal: watching.wBal,
+                reopt_count: reopt_count
+            };
+            fetch('http://localhost:5000/reoptimalization', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(opt_config),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+        
         if (watching.state.distance === 0) {
             chart_options.series = [...series];
         } else if (watching.state.distance >= distance_arr[distance_arr.length - 1]) {
@@ -352,31 +422,13 @@ export async function main() {
         chart.setOption(chart_options, true);
     });
 
+
+
+
     document.getElementById('startButton').addEventListener('click', function() {
-    console.log(athlete_distance[athlete_distance.length -1]);
     lead_in = athlete_distance[athlete_distance.length -1] + 5;
     opt_results.distance = opt_results.distance.map(element => element + lead_in);
-        
-        // Prepare the data to be sent to the server
-        // const data = { lead_in: 21 };
-
-    //     // Send the data to the server using the Fetch API
-    //     fetch('http://localhost:5000/startbanner', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify(data),
-    //     })
-    //     .then(response => response.json())
-    //     .then(data => {
-    //         console.log('Success:', data);
-    //     })
-    //     .catch((error) => {
-    //         console.error('Error:', error);
-    //     });
-    //     console.log(settings)
-        
+    this.style.display = 'none';
     });
 }
 

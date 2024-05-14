@@ -54,7 +54,7 @@
                 vertical-align: middle;
                 overflow: hidden;
             }
-            #current_power, #target_power {
+            #current_power, #target_power, #optimal_wbal {
                 width: 20vw; 
                 white-space: nowrap;
                 overflow: hidden; 
@@ -84,6 +84,7 @@
                     <tr>
                         <th>Power [W]</th>
                         <th>Target Power [W]</th>
+                        <th>Optimal W'bal [J]</th>
                     </tr>
                 </thead>
 
@@ -91,6 +92,7 @@
                     <tr>
                         <td heavy id="current_power"></td>
                         <td heavy id="target_power"></td>
+                        <td heavy id="optimal_wbal"></td>
                     </tr>
                 </tbody>
             </table>

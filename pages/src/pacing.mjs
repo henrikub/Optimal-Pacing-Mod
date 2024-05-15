@@ -293,10 +293,11 @@ export async function main() {
         
 
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power));
-        let target_wbal = get_optimal_wbal(watching.state.distance-lead_in, opt_results.distance, opt_results.w_bal);
+        let target_wbal = get_optimal_wbal(watching.state.distance, opt_results.distance, opt_results.w_bal);
         document.getElementById('current_power').innerHTML = watching.state.power;
         document.getElementById('target_power').innerHTML = target_power;
-        document.getElementById('optimal_wbal').innerHTML = Math.round(target_wbal);
+        document.getElementById('optimal_wbal').innerHTML = (Math.round(target_wbal) / 1000).toFixed(1);
+
         if (Math.abs(watching.state.power - target_power) <= 10) {
             document.getElementById('current_power').style.color = 'green';
         } else {

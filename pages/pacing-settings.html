@@ -107,11 +107,13 @@
                 </label>
                 <label>
                     <key>Lower bound at the start</key>
-                    <input type="range" min="0" max="100" value="100" name="bound_start">
+                    <input type="range" min="0" max="100" value="100" name="bound_start" id="bound_start">
+                    <output id = bound_start_value></output>
                 </label>
                 <label>
                     <key>Lower bound at the end</key>
-                    <input type="range" min="0" max="100" value="0" name="bound_end">
+                    <input type="range" min="0" max="100" value="0" name="bound_end" id="bound_end">
+                    <output id="bound_end_value"></output>
                 </label>
                 <label>
                     <key>Enable reoptimization</key>
@@ -125,6 +127,14 @@
         <script>
             document.getElementById('runOptimization').addEventListener('click', function() {
                 localStorage.setItem('optButtonClicked', 'true');
+            });
+        </script>
+        <script>
+            document.getElementById('bound_start').addEventListener('input', function() {
+                document.getElementById('bound_start_value').textContent = this.value;
+            });
+            document.getElementById('bound_end').addEventListener('input', function() {
+                document.getElementById('bound_end_value').textContent = this.value;
             });
         </script>
     </body>

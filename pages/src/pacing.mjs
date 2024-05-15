@@ -25,6 +25,7 @@ let power_color_data = [];
 let athlete_ftp;
 let last_reopt = 0;
 let reopt_count = 0;
+let reoptimizing = false;
 
 const powerZones = [
     {zone: 'Z1', from: 0, to: 0.5999},
@@ -41,16 +42,6 @@ const powerColors = {
     Z4: '#e5e541',
     Z5: '#FF5F1F',
     Z6: '#e20404' 
-};
-let prev_power_series = {
-    data: [[null, null]],
-    type: 'line',
-    smooth: true,
-    showSymbol: false,
-    lineStyle: {
-        width: 2,
-        color: 'black'
-    }
 };
 
 let gameConnection;
@@ -73,11 +64,24 @@ common.settingsStore.setDefault({
     fontScale: 1,
     solidBackground: false,
     backgroundColor: '#00ff00',
-
+    prevPowerColor: '#000000'
 });
 
 const settings = common.settingsStore.get();
 setBackground();
+
+let prev_power_series = {
+    data: [[null, null]],
+    type: 'line',
+    smooth: true,
+    showSymbol: false,
+    lineStyle: {
+        width: 2,
+        color: settings.prevPowerColor
+    }
+};
+
+
 
 let overlayMode;
 if (window.isElectron) {
@@ -370,15 +374,25 @@ export async function main() {
                     }
                 }
             },
-        };
+        };        
+        if (watching.state.distance === 0) {
+            chart_options.series = [...series];
+        } else if (watching.state.distance >= distance_arr[distance_arr.length - 1]) {
+            chart_options.series = [];
+        } else {
+            chart_options.series = [...series, prev_power_series];
+        }
+        chart.setOption(chart_options, true);
         
-        // console.log('*****************************')
+            // console.log('*****************************')
         // console.log(settings.reoptimization);
         // console.log(watching.state.distance);
         // console.log(Math.abs(watching.wBal-target_wbal))
         // console.log('*****************************')
-        if (settings.reoptimization === true && watching.state.distance > 1000 && Math.abs(watching.wBal-target_wbal)>3000 && (watching.state.distance - last_reopt) > 1000 && watching.state.distance < opt_results.distance[opt_results.distance.length-1]) {
+        
+        if (settings.reoptimization === true && watching.state.distance > 1000 && Math.abs(watching.wBal-target_wbal)>3000 && !reoptimizing && (watching.state.distance-last_reopt)>500 && watching.state.distance < opt_results.distance[opt_results.distance.length-1] && watching.state.speed > 10) {
             console.log("Need to reoptimize!");
+            reoptimizing = true;
             last_reopt = watching.state.distance
             reopt_count = reopt_count + 1;
             let opt_config = {
@@ -407,30 +421,23 @@ export async function main() {
             .then(response => response.json())
             .then(data => {
                 console.log('Success:', data);
+                if (data.result === 'Success') {
+                    reoptimizing = false;
+                }
             })
             .catch((error) => {
                 console.error('Error:', error);
             });
-        }
-        
-        if (watching.state.distance === 0) {
-            chart_options.series = [...series];
-        } else if (watching.state.distance >= distance_arr[distance_arr.length - 1]) {
-            chart_options.series = [];
-        } else {
-            chart_options.series = [...series, prev_power_series];
-        }
-        chart.setOption(chart_options, true);
-    });
-
-
-
-
+    }    
     document.getElementById('startButton').addEventListener('click', function() {
     lead_in = athlete_distance[athlete_distance.length -1] + 5;
     opt_results.distance = opt_results.distance.map(element => element + lead_in);
     this.style.display = 'none';
     });
+    
+    });
+
+
 }
 
 function setBackground() {

@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_cors import CORS
 import json
 import optimal_pacing as opt
@@ -157,7 +157,7 @@ def reoptimize():
             new_elevation.extend(elevation)
             new_friction.extend(friction)
             new_distance.extend([elem + i*max(distance) for elem in distance])
-            print("extending!!!!")
+
         elevation = new_elevation
         distance = new_distance
         friction = new_friction
@@ -242,7 +242,7 @@ def reoptimize():
         json.dump(power_dict, f)
 
 
-    return 'Success', 200
+    return jsonify({'result': 'Success'}), 200
 
 
 if __name__ == '__main__':

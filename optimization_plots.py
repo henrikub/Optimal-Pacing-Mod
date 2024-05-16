@@ -50,7 +50,15 @@ def plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_det
     ax[2].set_xlabel("Position [m]")
     ax[2].set_ylim(0, max(w_bal) + 1000)
     ax[2].plot(pos, w_bal)
-    ax[2].legend(["W'balance"], loc='upper right')
+    if opt_details.get("negative_split"):
+        w_bal_start = opt_details.get("w_bal_start")
+        w_bal_end = opt_details.get("w_bal_end")
+        x = np.linspace(0, optimal_time, len(pos))
+        bound =  (w_bal_end-w_bal_start)/optimal_time *x + w_bal_start
+        ax[2].plot(pos, bound)
+        ax[2].legend(["W'balance", "Lower bound on W'balance"], loc='upper right')
+    else:
+        ax[2].legend(["W'balance"], loc='upper right')
     ax3_twin = ax[2].twinx()
     ax3_twin.set_ylabel('Elevation [m]', color='tab:red')
     ax3_twin.plot(distance, elevation, color='tab:red')

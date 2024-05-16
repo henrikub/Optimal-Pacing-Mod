@@ -116,9 +116,11 @@ def run_opt():
         "integration_method": optimization_opts.get("integration_method"),
         "time_init_guess": optimization_opts.get("time_initial_guess"),
         "iterations": stats['iter_count'],
-        "opt_time": stats['t_wall_total']
+        "opt_time": stats['t_wall_total'],
+        "negative_split": optimization_opts.get("negative_split"),
+        "w_bal_start": optimization_opts.get("w_bal_start"),
+        "w_bal_end": optimization_opts.get("w_bal_end")
     }
-
 
     fig2 = plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_details, False)
     t_grid = ca.linspace(0, sol.value(T), N+1)

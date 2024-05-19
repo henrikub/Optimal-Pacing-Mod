@@ -24,27 +24,26 @@ You might need to write 'pip3' instead of 'pip' depending on your Python environ
 
 How to use:
 --------
-Run the following command to start the optimization settings interface
+Run the following command to start the server that runs in the background:
 ```
-python -m streamlit run app.py
+python server.py
 ```
 You might need to write 'python3' instead of 'python' depending on your Python environment.
 
-You will then be presented with the following display:  
+You can then specify the optimization settings in the settings part of the mod. If you want to reoptimize the power trajectory throughout the time trial, make sure to check the "Enable reoptimization" box in the settings interface. The reoptimization uses the w'balance value from S4Z, so make sure the values for CP and W' are the same in the optimization settings and in S4Z. 
 
-<img src="images/opt_display.png" width=600px/>
+<img src="images/mod_preferences.png" width=600px/>
 
-After specifying optimization settings, press the "Run optimization" button. The results will be displayed after the optimization routine is finished.
+After specifying optimization settings, press the "Run optimization" button. The plot of the optimization results will be saved in a file 'opt_plot.png' that is located in the mod directory.
 
-<img src="images/opt_results.png" width=600px/>  
+<img src="images/opt_plot.png" width=600px/>  
 
-You can now open the "Optimal Pacing" mod in S4Z and your target power will be shown with your powerzones based on your FTP. 
+You can now use the pacing strategy in a time trial. Make sure to press the "Approaching Start Banner" button when you are approximately 5 meters from the start banner. The mod window will display the target power with powerzones based on your FTP, your current power and the optimal W'bal at every point in the route.
 
 <img src="images/pacing_mod.png" width=400px/>  
 
-If you want to reoptimize the power trajectory throughout the time trial, make sure to press the "Start Time Trial" button before the TT starts. The reoptimization uses the w'balance value from S4Z, so make sure the values for CP and W' are the same in the optimization settings and in S4Z.  
+ 
 
 Known issues:
 --------
-- Sometimes the cyclist's previous power output gets "redrawn" many times in a row instead of incrementing steadily. It usually goes away after a few seconds, but if it gets too annoying closing and reopening the window should fix it.
-- There might be inaccuracies regarding the lead-in distance at the beginning of a route. As a consequence, the target power graph being slightly mispositioned along the route. However, if you cross the start banner exactly when the target power graph starts, it should be accurate enough.
+- Except for the "Cobbled Climbs" route, there might be slight inaccuracies regarding the length of the routes, such that the pacing strategy might end a bit before or after crossing the finish line.

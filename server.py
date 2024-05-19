@@ -132,7 +132,7 @@ def run_opt():
     }
     with open('pages/src/optimal_power.json', 'w') as file:
         json.dump(power_dict, file)
-    return 'Success', 200
+    return jsonify({'result': 'Success'}), 200
 
 
 @app.route('/reoptimalization', methods=['POST'])

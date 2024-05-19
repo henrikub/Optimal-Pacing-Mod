@@ -71,4 +71,4 @@ def plot_optimization_results(sol, U, X, T, distance, elevation, params, opt_det
     if streamlit:
         return fig
     else:
-        plt.show()
+        plt.savefig('opt_plot.png')

@@ -17,17 +17,9 @@ route_names = {
     'two_bridges_loop': 'Downtown Titans'
 }
 
-@app.route('/startbanner', methods=['POST'])
-def write_json():
-    data = request.get_json()
-    print("Lead in", data)
-
-    return 'Success', 200
-
 @app.route('/runopt', methods=['POST'])
 def run_opt():
     opt_config = request.get_json()
-    print(opt_config)
     route_name = route_names[opt_config['route']]
     num_laps = opt_config['num_laps']
     routes_dict = {}
@@ -139,8 +131,6 @@ def run_opt():
 def reoptimize():
     opt_config = request.get_json()
     initial_state = [opt_config['distance'], opt_config['speed'], opt_config['w_bal']]
-    print(initial_state)
-    print(opt_config)
     route_name = route_names[opt_config['route']]
     num_laps = opt_config['num_laps']
     routes_dict = {}
@@ -168,7 +158,7 @@ def reoptimize():
                 distance.pop(i+1)
                 elevation.pop(i+1)
                 friction.pop(i+1)
-    print(distance)
+
     # Params
     params = {
         'mass_rider': opt_config['weight'],
@@ -192,7 +182,7 @@ def reoptimize():
         # 'c': 80
     }
 
-    print("Need to reoptimize!")
+
     index = np.argwhere(np.array(distance) > initial_state[0])[0][0]
     dist = distance[index:]
     dist = [elem - distance[index] for elem in dist] # Shifting to start from 0

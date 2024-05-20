@@ -70,5 +70,4 @@ def create_initialization(time, x0, distance, elevation, params):
             lower_bound = slope_const
 
         end_index = np.argwhere(np.array(X[0,:]) >= distance[-1])[0][0]
-    #print("Slope constant is ", slope_const)
     return X[:,:end_index], power[:end_index], t_grid[:end_index]

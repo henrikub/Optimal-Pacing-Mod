@@ -67,7 +67,7 @@ common.settingsStore.setDefault({
     prevPowerColor: '#000000'
 });
 
-const settings = common.settingsStore.get();
+let settings = common.settingsStore.get();
 setBackground();
 
 let prev_power_series = {
@@ -294,7 +294,8 @@ export async function main() {
             lead_in = 0;
         }
         // console.log(watching)
-        
+        settings = common.settingsStore.get()
+        // console.log(settings.reoptimization)
 
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power));
         let target_wbal = get_optimal_wbal(watching.state.distance, opt_results.distance, opt_results.w_bal);
@@ -384,13 +385,7 @@ export async function main() {
         }
         chart.setOption(chart_options, true);
         
-            // console.log('*****************************')
-        // console.log(settings.reoptimization);
-        // console.log(watching.state.distance);
-        // console.log(Math.abs(watching.wBal-target_wbal))
-        // console.log('*****************************')
-        
-        if (settings.reoptimization === true && watching.state.distance > 1000 && Math.abs(watching.wBal-target_wbal)>3000 && !reoptimizing && (watching.state.distance-last_reopt)>500 && watching.state.distance < opt_results.distance[opt_results.distance.length-1] && watching.state.speed > 10) {
+        if (settings.reoptimization === true && watching.state.distance > 1000 && Math.abs(watching.wBal-target_wbal)>3000 && !reoptimizing && (watching.state.distance-last_reopt)>1000 && watching.state.distance < opt_results.distance[opt_results.distance.length-1] && watching.state.speed > 10) {
             console.log("Need to reoptimize!");
             reoptimizing = true;
             last_reopt = watching.state.distance
@@ -436,8 +431,6 @@ export async function main() {
     });
     
     });
-
-
 }
 
 function setBackground() {

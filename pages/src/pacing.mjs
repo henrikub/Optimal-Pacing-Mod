@@ -406,7 +406,7 @@ export async function main() {
                 w_bal: watching.wBal,
                 reopt_count: reopt_count
             };
-            fetch('http://localhost:5000/reoptimalization', {
+            fetch('http://localhost:5000/reoptimization', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

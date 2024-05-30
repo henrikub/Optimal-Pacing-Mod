@@ -127,7 +127,7 @@ def run_opt():
     return jsonify({'result': 'Success'}), 200
 
 
-@app.route('/reoptimalization', methods=['POST'])
+@app.route('/reoptimization', methods=['POST'])
 def reoptimize():
     opt_config = request.get_json()
     initial_state = [opt_config['distance'], opt_config['speed'], opt_config['w_bal']]
@@ -227,12 +227,6 @@ def reoptimize():
     }
     with open('pages/src/optimal_power.json', 'w') as file:
         json.dump(power_dict, file)
-    
-    reopt_count = opt_config['reopt_count']
-    filename = 'reoptimizations/reopt' + str(reopt_count) + '.json'
-    with open(filename, 'w') as f:
-        json.dump(power_dict, f)
-
 
     return jsonify({'result': 'Success'}), 200
 

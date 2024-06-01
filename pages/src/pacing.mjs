@@ -27,7 +27,7 @@ let last_reopt = 0;
 let reopt_count = 0;
 let reoptimizing = false;
 
-const powerZones = [
+const power_zones = [
     {zone: 'Z1', from: 0, to: 0.5999},
     {zone: 'Z2', from: 0.6, to: 0.7599},
     {zone: 'Z3', from: 0.76, to: 0.8999},
@@ -35,7 +35,7 @@ const powerZones = [
     {zone: 'Z5', from: 1.05, to: 1.1799},
     {zone: 'Z6', from: 1.18, to: null}
 ];
-const powerColors = {
+const power_colors = {
     Z1: '#8e8e86',
     Z2: '#0b6ff4',
     Z3: '#34bf34',
@@ -64,7 +64,7 @@ common.settingsStore.setDefault({
     fontScale: 1,
     solidBackground: false,
     backgroundColor: '#00ff00',
-    prevPowerColor: '#000000'
+    prev_power_color: '#000000'
 });
 
 let settings = common.settingsStore.get();
@@ -77,11 +77,9 @@ let prev_power_series = {
     showSymbol: false,
     lineStyle: {
         width: 2,
-        color: settings.prevPowerColor
+        color: settings.prev_power_color
     }
 };
-
-
 
 let overlayMode;
 if (window.isElectron) {
@@ -107,7 +105,6 @@ async function check_json_change() {
   if (JSON.stringify(data) !== JSON.stringify(cache)) {
 
     opt_results = data;
-    // opt_results.distance = opt_results.distance.map(element => element + lead_in);
     cache = opt_results;
     document.getElementById('message_box').innerHTML = 'Reoptimized!';
     target_power_data = [];
@@ -121,7 +118,7 @@ async function check_json_change() {
 setInterval(check_json_change, 5000);
 
 async function check_run_opt_button() {
-    if (localStorage.getItem('optButtonClicked') === 'true') {
+    if (localStorage.getItem('opt_button_clicked') === 'true') {
         console.log("opt button clicked")
 
         let opt_config = {
@@ -150,7 +147,7 @@ async function check_run_opt_button() {
         .catch((error) => {
             console.error('Error:', error);
         });
-        localStorage.setItem('optButtonClicked', 'false');
+        localStorage.setItem('opt_button_clicked', 'false');
     }
 }
 
@@ -226,19 +223,19 @@ function get_target_power_array(distance, distance_arr, power_arr) {
         start = 0;
     }
 
-    let sliceStart = Math.max(0, start - 50);
-    let sliceEnd = Math.min(distance_arr.length, start + 50);
-    return [power_arr.slice(sliceStart, sliceEnd), distance_arr.slice(sliceStart, sliceEnd)];
+    let slice_start = Math.max(0, start - 50);
+    let slice_end = Math.min(distance_arr.length, start + 50);
+    return [power_arr.slice(slice_start, slice_end), distance_arr.slice(slice_start, slice_end)];
 }
 
-function getPowerColors(power, ftp, powerZones, powerColors) {
+function get_power_colors(power, ftp, power_zones, power_colors) {
     let colors = [];
     for (let i = 0; i < power.length; i++) {
-        let powerFtpRatio = power[i]/ftp;
-        let closestZone = powerZones.reduce((prev, curr) => {
-            return (Math.abs(curr.from - powerFtpRatio) < Math.abs(prev.from - powerFtpRatio) ? curr : prev);
+        let power_ftp_ratio = power[i]/ftp;
+        let closest_zone = power_zones.reduce((prev, curr) => {
+            return (Math.abs(curr.from - power_ftp_ratio) < Math.abs(prev.from - power_ftp_ratio) ? curr : prev);
         });
-        colors.push(powerColors[closestZone.zone]);
+        colors.push(power_colors[closest_zone.zone]);
     }
     return colors;
 }
@@ -293,9 +290,8 @@ export async function main() {
             athlete_ftp = watching.athlete.ftp
             lead_in = 0;
         }
-        // console.log(watching)
+
         settings = common.settingsStore.get()
-        // console.log(settings.reoptimization)
 
         let target_power = Math.round(get_target_power(watching.state.distance, opt_results.distance, opt_results.power));
         let target_wbal = get_optimal_wbal(watching.state.distance, opt_results.distance, opt_results.w_bal);
@@ -321,7 +317,7 @@ export async function main() {
 
         prev_power_series.data = [[null, null], ...prev_power_data];
         if (target_power_arr != null && athlete_ftp !=null) {
-            power_color_data = getPowerColors(target_power_arr, watching.athlete.ftp, powerZones, powerColors);
+            power_color_data = get_power_colors(target_power_arr, watching.athlete.ftp, power_zones, power_colors);
         }
 
         let series = [];

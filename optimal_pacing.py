@@ -14,6 +14,24 @@ def calculate_gradient(distance, elevation):
     gradient.append(0)
     return gradient
 
+def extend_route(distance, elevation, friction, num_laps):
+    new_elevation = []
+    new_distance = []
+    new_friction = []
+    for i in range(num_laps):
+        new_elevation.extend(elevation)
+        new_friction.extend(friction)
+        new_distance.extend([elem + i*max(distance) for elem in distance])
+    elevation = new_elevation
+    distance = new_distance
+    friction = new_friction
+    for i in range(len(distance)-10):
+        if distance[i+1] - distance[i] < 0.6:
+            distance.pop(i+1)
+            elevation.pop(i+1)
+            friction.pop(i+1)
+    return new_distance, new_elevation, new_friction
+
 def smooth_w_balance_ode_derivative(u, cp, x, w_prime, smoothness=10):
     transition = 0.5 + 0.5*ca.tanh((u - cp)/smoothness)
     
@@ -62,7 +80,6 @@ def solve_opt(distance, elevation, params, optimization_opts, initialization):
 
     slope = calculate_gradient(distance, smoothed_elev)
     interpolated_slope = ca.interpolant('Slope', 'bspline', [distance], slope)
-
     interpolated_friction = ca.interpolant('Friction', 'bspline', [distance], mu)
 
     if optimization_opts.get("w_bal_model") == "ODE":  
@@ -105,10 +122,6 @@ def solve_opt(distance, elevation, params, optimization_opts, initialization):
 
     # Max power constraint params
     alpha = params.get("alpha")
-    # alpha_c = params.get("alpha_c")
-    # c_max = params.get("c_max")
-    # c = params.get("c")
-    # U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
     U_max = alpha*w_bal + cp
 
     # Set the path constraints
@@ -221,10 +234,6 @@ def reoptimize(distance, elevation, X0, params, optimization_opts, initializatio
 
     # Max power constraint params
     alpha = params.get("alpha")
-    # alpha_c = params.get("alpha_c")
-    # c_max = params.get("c_max")
-    # c = params.get("c")
-    #U_max = 4*(alpha*w_bal + cp)*(c/(alpha_c*w_bal + c_max)*(1-c/(alpha_c*w_bal + c_max)))
     U_max = alpha*w_bal + cp
 
     # Set the path constraints

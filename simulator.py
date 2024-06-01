@@ -39,7 +39,6 @@ def create_initialization(time, x0, distance, elevation, params):
     N = len(time)
     t_grid = np.linspace(0,tf,N)
 
-
     dt = tf/N  
     t0 = 0
     x = ca.MX.sym('x', 3) 

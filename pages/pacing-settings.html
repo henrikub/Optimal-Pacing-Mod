@@ -59,7 +59,7 @@
                 </label>
                 <label>
                     <key>Previous power graph color:</key>
-                    <input type="color" name="prevPowerColor">
+                    <input type="color" name="prev_power_color">
                 </label>
                 <hr>
                 <p class="space"></p>
@@ -107,7 +107,7 @@
                 <label>
                     <key>Negative Split Pacing</key>
                     <input type="checkbox" id="negative_split" name="negative_split">
-                    <div id="slidersContainer"></div>
+                    <div id="sliders_container"></div>
                 </label>
                 <label>
                     <key>Lower bound at the start</key>
@@ -125,12 +125,12 @@
                 </label>
                 
                 <hr>
-                <button id="runOptimization">Run Optimization</button>
+                <button id="run_optimization">Run Optimization</button>
             </form>
         </div>
         <script>
-            document.getElementById('runOptimization').addEventListener('click', function() {
-                localStorage.setItem('optButtonClicked', 'true');
+            document.getElementById('run_optimization').addEventListener('click', function() {
+                localStorage.setItem('opt_button_clicked', 'true');
             });
         </script>
         <script>

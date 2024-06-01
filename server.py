@@ -29,22 +29,10 @@ def run_opt():
     distance = routes_dict[route_name]['distance']
     elevation = routes_dict[route_name]['elevation']
     friction = routes_dict[route_name]['friction']
+
     if num_laps != 1:
-        new_elevation = []
-        new_distance = []
-        new_friction = []
-        for i in range(num_laps):
-            new_elevation.extend(elevation)
-            new_friction.extend(friction)
-            new_distance.extend([elem + i*max(distance) for elem in distance])
-        elevation = new_elevation
-        distance = new_distance
-        friction = new_friction
-        for i in range(len(distance)-10):
-            if distance[i+1] - distance[i] < 0.6:
-                distance.pop(i+1)
-                elevation.pop(i+1)
-                friction.pop(i+1)
+        distance, elevation, friction = opt.extend_route(distance, elevation, friction, num_laps)
+    
     # Params
     params = {
         'mass_rider': opt_config['weight'],
@@ -57,17 +45,12 @@ def run_opt():
         'r': 0.33,
         'Cd': 0.7,
         'rho': 1.2,
-        # 'A': 0.0293*height**(0.725)*mass**(0.441) + 0.0604,
         'A': 0.4,
         'eta': 1,
         'w_prime': opt_config['w_prime'],
         'cp': opt_config['cp'],
         'alpha': (opt_config['max_power']-opt_config['cp'])/opt_config['w_prime']
-        # 'alpha_c': 0.01,
-        # 'c_max': 150,
-        # 'c': 80
     }
-
 
     N = round(distance[-1]/5)
     timegrid = np.linspace(0,round(distance[-1]/1000*150), N)
@@ -141,23 +124,9 @@ def reoptimize():
     distance = routes_dict[route_name]['distance']
     elevation = routes_dict[route_name]['elevation']
     friction = routes_dict[route_name]['friction']
-    if num_laps != 1:
-        new_elevation = []
-        new_distance = []
-        new_friction = []
-        for i in range(num_laps):
-            new_elevation.extend(elevation)
-            new_friction.extend(friction)
-            new_distance.extend([elem + i*max(distance) for elem in distance])
 
-        elevation = new_elevation
-        distance = new_distance
-        friction = new_friction
-        for i in range(len(distance)-10):
-            if distance[i+1] - distance[i] < 0.6:
-                distance.pop(i+1)
-                elevation.pop(i+1)
-                friction.pop(i+1)
+    if num_laps != 1:
+        distance, elevation, friction = opt.extend_route(distance, elevation, friction, num_laps)
 
     # Params
     params = {
@@ -171,17 +140,12 @@ def reoptimize():
         'r': 0.33,
         'Cd': 0.7,
         'rho': 1.2,
-        # 'A': 0.0293*height**(0.725)*mass**(0.441) + 0.0604,
         'A': 0.4,
         'eta': 1,
         'w_prime': opt_config['w_prime'],
         'cp': opt_config['cp'],
         'alpha': (opt_config['max_power']-opt_config['cp'])/opt_config['w_prime']
-        # 'alpha_c': 0.01,
-        # 'c_max': 150,
-        # 'c': 80
     }
-
 
     index = np.argwhere(np.array(distance) > initial_state[0])[0][0]
     dist = distance[index:]

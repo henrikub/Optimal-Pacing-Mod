@@ -1,4 +1,4 @@
-Sauce4zwift Optimal Pacing Mod
+Sauce4Zwift Optimal Pacing Mod
 ========
 
 How to install:
@@ -38,12 +38,13 @@ After specifying optimization settings, press the "Run optimization" button. The
 
 <img src="images/opt_plot.png" width=600px/>  
 
-You can now use the pacing strategy in a time trial. Make sure to press the "Approaching Start Banner" button when you are approximately 5 meters from the start banner. The mod window will display the target power with powerzones based on your FTP, your current power and the optimal W'bal at every point in the route.
+You can now use the pacing strategy in a time trial. Make sure to press the "Approaching Start Banner" button when you are approximately 5 meters from the start banner. The button will appear in the lower left corner of the mod's main window and can only be pressed once in a TT. The mod window will display the target power with powerzones based on your FTP, your current power and the optimal W'bal at every point in the route.
 
 <img src="images/pacing_mod.png" width=400px/>  
 
  
 
-Known issues:
+Known issues/Limitations:
 --------
 - Except for the "Cobbled Climbs" route, there might be slight inaccuracies regarding the length of the routes, such that the pacing strategy might end a bit before or after crossing the finish line.
+- There are currently only a few routes that are available for selection.

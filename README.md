@@ -42,7 +42,8 @@ You can now use the pacing strategy in a time trial. Make sure to press the "App
 
 <img src="images/pacing_mod.png" width=400px/>  
 
- 
+Here is a YouTube video showing how the Optimal Pacing Mod is used in practice:
+https://www.youtube.com/watch?v=4hc5r82Qq1E
 
 Known issues/Limitations:
 --------
